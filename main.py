@@ -1,7 +1,9 @@
-import numpy
-
+import itertools
+import matplotlib.pyplot as plt
+import time
 from constants import G
 import numpy as np
+from matplotlib.animation import FuncAnimation
 class Planet:
     def __init__(self, mass, position):
         self._mass = mass
@@ -17,7 +19,7 @@ class Planet:
 
     @position.setter
     def position(self, new_position):
-        if not isinstance(new_position, numpy.ndarray):
+        if not isinstance(new_position, np.ndarray):
             raise AssertionError('Position must be a element tuple.')
         if len(new_position) != 2:
             raise AssertionError('Position must contain 2 elements for x and y axis.')
@@ -68,7 +70,8 @@ class Planet:
 class SolarSystem:
     def __init__(self):
         self.planets = []
-        self.dt = 10
+        self.dt = 10000
+        # self.draw = Draw()
 
     def distance(self, pos1, pos2):
         # return np.sqrt((pos2[0] - pos1[0])**2 + (pos2[1] - pos1[1])**2)
@@ -79,9 +82,10 @@ class SolarSystem:
         return vector / np.linalg.norm(vector)
 
     def add_planets(self):
-        p = Planet(300000000000, np.array([23.0, 13.0]))
-        g = Planet(40000000, np.array([100.0, 82.0]))
-        self.planets.extend([p, g])
+        p = Planet(30000000, np.array([400.0, 400.0]))
+        g = Planet(40000000, np.array([250.0, 250.0]))
+        q = Planet(30000000, np.array([100.0, 100.0]))
+        self.planets.extend([p, g, q])
 
     def calculate_force(self, planet1, planet2):
         F = (self.unit_vector(self.distance(planet1.position, planet2.position)) * (G * (planet1.mass * planet2.mass))) / (
@@ -100,16 +104,71 @@ class SolarSystem:
         s = velocity * self.dt
         return s
 
-    def calc(self):
-        F = self.calculate_force(self.planets[0], self.planets[1])
-        a = self.calculate_acceleration(F,self.planets[0])
-        v = self.calculate_velocity(a)
-        s = self.calculate_distance(v)
-        print(self.planets[0].position)
-        self.planets[0].position += s
-        print(self.planets[0].position)
+    # def update_position(self):
+    #     F = self.calculate_force(self.planets[0], self.planets[1])
+    #     a = self.calculate_acceleration(F, self.planets[0])
+    #     v = self.calculate_velocity(a)
+    #     s = self.calculate_distance(v)
+    #     # print(self.planets[0].position)
+    #     self.planets[0].position += s
+    #     # print(self.planets[0].position)
+
+    def update_position(self):
+        # do for each of two planets
+        for planet1, planet2 in itertools.permutations(self.planets, 2):
+            F = self.calculate_force(planet1, planet2)
+            a = self.calculate_acceleration(F, planet1)
+            v = self.calculate_velocity(a)
+            s = self.calculate_distance(v)
+            planet1.position += s
 
 
+    def plot_everything(self):
+        self.images = []
+        x = np.array([p.position[0] for p in self.planets])
+        y = np.array([p.position[1] for p in self.planets])
+
+        fig, axes = plt.subplots()
+        axes.set_xlim(0,500)
+        axes.set_ylim(0, 500)
+        plt.scatter(x, y)
+        plt.xlabel('X-axis')
+        plt.ylabel('Y-axis')
+        plt.show()
+        # self.images.append(im)
+        # Display the plot
+
+        # plt.pause(0.5)
+        # im = plt.
+
+
+    def run(self):
+        for _ in range(100):
+            self.update_position()
+            # print(self.planets[0].position)
+            self.plot_everything()
+
+
+# class Draw:
+#     def __init__(self):
+#         self.fig, self.axes = plt.subplots()
+#         self.axes.set_xlim(0, 500)
+#         self.axes.set_ylim(0, 500)
+#         plt.xlabel('X-axis')
+#         plt.ylabel('Y-axis')
+#     def plot(self, planets):
+#         self.x = np.array([p.position[0] for p in planets])
+#         self.y = np.array([p.position[1] for p in planets])
+#         self.axes
+#
+#     def animate(self):
+#
+#     def animate(self):
+#
+#         # anim.save('sine_wave.gif', writer='imagemagick')
+#         plt.show()
+#         plt.scatter()
+#         plt.show()
 
 
 
@@ -147,5 +206,7 @@ class SolarSystem:
 
 system = SolarSystem()
 system.add_planets()
-system.calc()
+# system.update_position()
+# system.plot_everything()
+system.run()
 
