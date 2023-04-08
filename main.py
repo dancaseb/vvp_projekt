@@ -5,13 +5,16 @@ from constants import G
 import numpy as np
 from matplotlib.animation import FuncAnimation
 class Planet:
-    def __init__(self, mass, position):
+    def __init__(self, mass, position, velocity, name):
+        self.name = name
         self._mass = mass
         self._position = position
         self._acceleration = np.array([0.0, 0.0])
         # self._direction = np.array([0, 0])
         self._force = np.array([0.0, 0.0])
-        self._velocity = np.array([0.0, 0.0])
+        self._velocity = velocity
+        self.forces = []
+        self.dt = 1
 
     @property
     def position(self):
@@ -65,12 +68,41 @@ class Planet:
     def velocity(self, new_velocity):
         self._velocity = new_velocity
 
+    def calculate_position(self):
+        # force asi neni vektor. Podivat se co je ve forces a co udela sum
+        self.force = np.sum(self.forces)
+        print(f"force {self.force}")
+        # print(self.position,self.forces)
+        a = self.calculate_acceleration(self.force)
+        s = self.calculate_distance(self.velocity, a)
+        self.position += s
+        v = self.calculate_velocity(a)
+        self.velocity = v
+        # print(f"velocity {self.velocity}")
+
+
+        self.forces.clear()
+        # print(f"position {self.position}")
+
+    def calculate_acceleration(self, force):
+        a = force / self.mass
+        return a
+
+    def calculate_velocity(self, acceleration):
+        v = acceleration * self.dt + self.velocity
+        return v
+
+    def calculate_distance(self, velocity, acceleration):
+        # s = velocity * self.dt
+        s = 0.5 * acceleration * self.dt**2 + velocity * self.dt
+        return s
+
 
 
 class SolarSystem:
     def __init__(self):
         self.planets = []
-        self.dt = 10000
+        self.dt = 1
         # self.draw = Draw()
 
     def distance(self, pos1, pos2):
@@ -82,27 +114,19 @@ class SolarSystem:
         return vector / np.linalg.norm(vector)
 
     def add_planets(self):
-        p = Planet(30000000, np.array([400.0, 400.0]))
-        g = Planet(40000000, np.array([250.0, 250.0]))
-        q = Planet(30000000, np.array([100.0, 100.0]))
-        self.planets.extend([p, g, q])
+        sun = Planet(50, np.array([float(10000000/2), float(10000000/2)]), np.array([0.0, 0.0]), name="sun")
+        p = Planet(3.301e+23, np.array([float(10000000/2), 0.0]), np.array([-28011.358452879696, 38237.72741186753]), name="planet")
+        # g = Planet(1.989e+30, np.array([10000000.0, 10000000.0]), np.array([0, 0]))
+        # q = Planet(30000000, np.array([100.0, 100.0]))
+        self.planets.extend([sun, p])
 
     def calculate_force(self, planet1, planet2):
         F = (self.unit_vector(self.distance(planet1.position, planet2.position)) * (G * (planet1.mass * planet2.mass))) / (
                     np.linalg.norm(self.distance(planet1.position, planet2.position)) ** 2)
+        # print(f"distance {np.linalg.norm(self.distance(planet1.position, planet2.position))}")
+        # print(np.linalg.norm(self.distance(planet1.position, planet2.position)))
         return F
 
-    def calculate_acceleration(self, force, planet):
-        a = force / planet.mass
-        return a
-
-    def calculate_velocity(self, acceleration):
-        v = acceleration * self.dt
-        return v
-
-    def calculate_distance(self, velocity):
-        s = velocity * self.dt
-        return s
 
     # def update_position(self):
     #     F = self.calculate_force(self.planets[0], self.planets[1])
@@ -115,22 +139,40 @@ class SolarSystem:
 
     def update_position(self):
         # do for each of two planets
-        for planet1, planet2 in itertools.permutations(self.planets, 2):
-            F = self.calculate_force(planet1, planet2)
-            a = self.calculate_acceleration(F, planet1)
-            v = self.calculate_velocity(a)
-            s = self.calculate_distance(v)
-            planet1.position += s
+        # for planet1, planet2 in itertools.permutations(self.planets, 2):
+        #     # print(planet1, planet2)
+        #     F = self.calculate_force(planet1, planet2)
+        #     print(f"F:{F}")
+        #     a = self.calculate_acceleration(F, planet1)
+        #     print(f"a:{a}")
+        #     v = self.calculate_velocity(a, planet1)
+        #     planet1.velocity = v
+        #     print(planet1.velocity)
+        #     s = self.calculate_distance(v)
+        #     planet1.position += s
+        #     print(planet1.position)
+        for index1, planet1 in enumerate(self.planets):
+            for index2, planet2 in enumerate(self.planets):
+                if index2 == index1:
+                    continue
+                else:
+                    # print(planet1, planet2)
+                    F = self.calculate_force(planet1, planet2)
+                    planet1.forces.append(F)
+
+        for planet in self.planets:
+            print(planet.name)
+            planet.calculate_position()
+            print("**********************")
 
 
     def plot_everything(self):
         self.images = []
         x = np.array([p.position[0] for p in self.planets])
         y = np.array([p.position[1] for p in self.planets])
-
         fig, axes = plt.subplots()
-        axes.set_xlim(0,500)
-        axes.set_ylim(0, 500)
+        axes.set_xlim(0, 10000000)
+        axes.set_ylim(0, 10000000)
         plt.scatter(x, y)
         plt.xlabel('X-axis')
         plt.ylabel('Y-axis')
@@ -144,9 +186,10 @@ class SolarSystem:
 
     def run(self):
         for _ in range(100):
+            self.plot_everything()
             self.update_position()
             # print(self.planets[0].position)
-            self.plot_everything()
+
 
 
 # class Draw:
