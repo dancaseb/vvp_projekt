@@ -69,7 +69,6 @@ class Planet:
         self._velocity = new_velocity
 
     def calculate_position(self):
-        # force asi neni vektor. Podivat se co je ve forces a co udela sum
         self.force = np.add.reduce(self.forces)
         print(f"force {self.force}")
         # print(self.position,self.forces)
@@ -114,11 +113,16 @@ class SolarSystem:
 
     def add_planets(self):
         sun = Planet(1.989e+30, np.array([0.0, 0.0]), np.array([0.0, 0.0]), name="sun")
-        # p = Planet(10**10, np.array([0, 342218282.256115]), np.array([-28011.358452879696, -38237.72741186753]), name="planet")
-        p = Planet(3.301e+23, np.array([46715511567.428986, 34221828241.256115]), np.array([-28011.358452879696,38237.72741186753]), name="planet")
+        # p = Planet(10**10, np.array([0, 342218282.256115]), np.array([-28011.358452879696,
+        # -38237.72741186753]), name="planet")
+        mercury = Planet(3.301e+23, np.array([46715511567.428986, 34221828241.256115]),
+                         np.array([-28011.358452879696, 38237.72741186753]), name="mercury")
+        venus = Planet(4.867e+24, np.array([-86869168232.3607, -64520695457.83519]),
+                       np.array([20869.112567920518, -28097.689239997333]), name="venus")
+
         # g = Planet(1.989e+30, np.array([10000000.0, 10000000.0]), np.array([0, 0]))
         # q = Planet(30000000, np.array([100.0, 100.0]))
-        self.planets.extend([sun, p])
+        self.planets.extend([sun, mercury, venus])
 
     def calculate_force(self, planet1, planet2):
         F = (self.unit_vector(self.distance(planet1.position, planet2.position)) * (G * (planet1.mass * planet2.mass))) / (
@@ -236,7 +240,7 @@ class Animation:
         self.system = SolarSystem()
         self.system.add_planets()
 
-        self.animation = FuncAnimation(self.fig, self.update, frames=10000, interval=200)
+        self.animation = FuncAnimation(self.fig, self.update, frames=10000, interval=25)
         self.paused = False
 
         self.fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
