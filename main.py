@@ -4,6 +4,7 @@ import time
 from constants import G
 import numpy as np
 from matplotlib.animation import FuncAnimation
+import json
 class Planet:
     def __init__(self, mass, position, velocity, name):
         self.name = name
@@ -14,7 +15,7 @@ class Planet:
         self._force = np.array([0.0, 0.0])
         self._velocity = velocity
         self.forces = []
-        self.dt = 10000
+        self.dt = 60*60*24
 
     @property
     def position(self):
@@ -70,14 +71,14 @@ class Planet:
 
     def calculate_position(self):
         self.force = np.add.reduce(self.forces)
-        print(f"force {self.force}")
+        # print(f"force {self.force}")
         # print(self.position,self.forces)
         a = self.calculate_acceleration(self.force)
         v = self.calculate_velocity(a)
         self.velocity = v
         s = self.calculate_distance(self.velocity, a)
         self.position += s
-        print(f"position {self.position}")
+        # print(f"position {self.position}")
 
         # print(f"velocity {self.velocity}")
         self.forces.clear()
@@ -88,6 +89,7 @@ class Planet:
         return a
 
     def calculate_velocity(self, acceleration):
+        # mozna blbe? to znamena, ze se porad zrychluje, idk
         v = acceleration * self.dt + self.velocity
         return v
 
@@ -111,18 +113,26 @@ class SolarSystem:
     def unit_vector(self, vector):
         return vector / np.linalg.norm(vector)
 
-    def add_planets(self):
-        sun = Planet(1.989e+30, np.array([0.0, 0.0]), np.array([0.0, 0.0]), name="sun")
-        # p = Planet(10**10, np.array([0, 342218282.256115]), np.array([-28011.358452879696,
-        # -38237.72741186753]), name="planet")
-        mercury = Planet(3.301e+23, np.array([46715511567.428986, 34221828241.256115]),
-                         np.array([-28011.358452879696, 38237.72741186753]), name="mercury")
-        venus = Planet(4.867e+24, np.array([-86869168232.3607, -64520695457.83519]),
-                       np.array([20869.112567920518, -28097.689239997333]), name="venus")
-
-        # g = Planet(1.989e+30, np.array([10000000.0, 10000000.0]), np.array([0, 0]))
-        # q = Planet(30000000, np.array([100.0, 100.0]))
-        self.planets.extend([sun, mercury, venus])
+    def add_planets(self, planets):
+        for planet_name in planets:
+            # print(planet_name)
+            # # print(planets[planet_name])
+            # print(planets[planet_name]['position'], planets[planet_name]['velocity'], planets[planet_name]['mass'])
+            self.planets.append(
+                Planet(position=np.array(planets[planet_name]['position']),
+                       velocity=np.array(planets[planet_name]['velocity']),
+                       mass=planets[planet_name]['mass'], name=planet_name))
+        # sun = Planet(1.989e+30, np.array([0.0, 0.0]), np.array([0.0, 0.0]), name="sun")
+        # # p = Planet(10**10, np.array([0, 342218282.256115]), np.array([-28011.358452879696,
+        # # -38237.72741186753]), name="planet")
+        # mercury = Planet(3.301e+23, np.array([46715511567.428986, 34221828241.256115]),
+        #                  np.array([-28011.358452879696, 38237.72741186753]), name="mercury")
+        # venus = Planet(4.867e+24, np.array([-86869168232.3607, -64520695457.83519]),
+        #                np.array([20869.112567920518, -28097.689239997333]), name="venus")
+        #
+        # # g = Planet(1.989e+30, np.array([10000000.0, 10000000.0]), np.array([0, 0]))
+        # # q = Planet(30000000, np.array([100.0, 100.0]))
+        # self.planets.extend([sun, mercury, venus])
 
     def calculate_force(self, planet1, planet2):
         F = (self.unit_vector(self.distance(planet1.position, planet2.position)) * (G * (planet1.mass * planet2.mass))) / (
@@ -165,9 +175,9 @@ class SolarSystem:
                     planet1.forces.append(F)
 
         for planet in self.planets:
-            print(planet.name)
+            # print(planet.name)
             planet.calculate_position()
-            print("**********************")
+            # print("**********************")
 
         x = np.array([p.position[0] for p in self.planets])
         y = np.array([p.position[1] for p in self.planets])
@@ -214,7 +224,8 @@ class Animation:
 
 
     # Define the update function for the animation
-
+    def __init__(self, solar_system):
+        self.system = solar_system#
 
     def update(self, frame):
         # Calculate the new position of the point
@@ -237,10 +248,10 @@ class Animation:
         self.x = np.array([])
         self.y = np.array([])
         self.scatter = self.ax.scatter([], [])
-        self.system = SolarSystem()
-        self.system.add_planets()
+        # self.system = SolarSystem()
+        # self.system.add_planets()
 
-        self.animation = FuncAnimation(self.fig, self.update, frames=10000, interval=25)
+        self.animation = FuncAnimation(self.fig, self.update, frames=1000, interval=200)
         self.paused = False
 
         self.fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
@@ -254,6 +265,29 @@ class Animation:
         else:
             self.animation.pause()
         self.paused = not self.paused
+
+
+class Loader:
+    def __init__(self, path):
+        self.path = path
+
+    def load_data(self):
+        with open(self.path) as file:
+            data = json.loads(file.read())
+        return data
+
+
+class Manager:
+    def __init__(self):
+        self.loader = Loader("data/planets.json")
+        self.system = SolarSystem()
+        self.animation = Animation(self.system)
+
+    def run(self):
+        planets = self.loader.load_data()
+        self.system.add_planets(planets)
+        self.animation.plot()
+
 
 
 
@@ -317,6 +351,6 @@ class Animation:
 # # system.update_position()
 # # system.plot_everything()
 # system.run()
-animation = Animation()
-animation.plot()
+manager = Manager()
+manager.run()
 
