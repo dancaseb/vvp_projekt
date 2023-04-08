@@ -14,7 +14,7 @@ class Planet:
         self._force = np.array([0.0, 0.0])
         self._velocity = velocity
         self.forces = []
-        self.dt = 1
+        self.dt = 10000
 
     @property
     def position(self):
@@ -70,17 +70,17 @@ class Planet:
 
     def calculate_position(self):
         # force asi neni vektor. Podivat se co je ve forces a co udela sum
-        self.force = np.sum(self.forces)
+        self.force = np.add.reduce(self.forces)
         print(f"force {self.force}")
         # print(self.position,self.forces)
         a = self.calculate_acceleration(self.force)
-        s = self.calculate_distance(self.velocity, a)
-        self.position += s
         v = self.calculate_velocity(a)
         self.velocity = v
+        s = self.calculate_distance(self.velocity, a)
+        self.position += s
+        print(f"position {self.position}")
+
         # print(f"velocity {self.velocity}")
-
-
         self.forces.clear()
         # print(f"position {self.position}")
 
@@ -102,7 +102,6 @@ class Planet:
 class SolarSystem:
     def __init__(self):
         self.planets = []
-        self.dt = 1
         # self.draw = Draw()
 
     def distance(self, pos1, pos2):
@@ -114,8 +113,9 @@ class SolarSystem:
         return vector / np.linalg.norm(vector)
 
     def add_planets(self):
-        sun = Planet(50, np.array([float(10000000/2), float(10000000/2)]), np.array([0.0, 0.0]), name="sun")
-        p = Planet(3.301e+23, np.array([float(10000000/2), 0.0]), np.array([-28011.358452879696, 38237.72741186753]), name="planet")
+        sun = Planet(1.989e+30, np.array([0.0, 0.0]), np.array([0.0, 0.0]), name="sun")
+        # p = Planet(10**10, np.array([0, 342218282.256115]), np.array([-28011.358452879696, -38237.72741186753]), name="planet")
+        p = Planet(3.301e+23, np.array([46715511567.428986, 34221828241.256115]), np.array([-28011.358452879696,38237.72741186753]), name="planet")
         # g = Planet(1.989e+30, np.array([10000000.0, 10000000.0]), np.array([0, 0]))
         # q = Planet(30000000, np.array([100.0, 100.0]))
         self.planets.extend([sun, p])
@@ -165,30 +165,91 @@ class SolarSystem:
             planet.calculate_position()
             print("**********************")
 
-
-    def plot_everything(self):
-        self.images = []
         x = np.array([p.position[0] for p in self.planets])
         y = np.array([p.position[1] for p in self.planets])
-        fig, axes = plt.subplots()
-        axes.set_xlim(0, 10000000)
-        axes.set_ylim(0, 10000000)
-        plt.scatter(x, y)
-        plt.xlabel('X-axis')
-        plt.ylabel('Y-axis')
+        return x, y
+
+
+
+
+    # def plot(self):
+    # def plot_everything(self):
+    #     x = np.array([p.position[0] for p in self.planets])
+    #     y = np.array([p.position[1] for p in self.planets])
+    #     fig, axes = plt.subplots()
+    #     axes.set_xlim(0, 10000000)
+    #     axes.set_ylim(0, 10000000)
+    #     plt.scatter(x, y)
+    #     # plt.xlabel('X-axis')
+    #     # plt.ylabel('Y-axis')
+    #     plt.show()
+    #     # self.images.append(im)
+    #     # Display the plot
+    #
+    #     # plt.pause(0.5)
+    #     # im = plt.
+
+    #
+    # def run(self):
+    #     self.update_position()
+    #     # print(self.planets[0].position)
+
+
+# class Draw:
+#     def __init__(self):
+#         self.fig, self.axes = plt.subplots()
+#         self.axes.set_xlim(0, 10000000)
+#         self.axes.set_ylim(0, 10000000)
+#         point, = self.axes.plot(0, 0, marker='o', markersize=10, color='red')
+#         plt.xlabel('X-axis')
+#         plt.ylabel('Y-axis')
+#
+#     def update(self, frame, points):
+class Animation:
+    # Define the initial position of the point
+
+
+    # Define the update function for the animation
+
+
+    def update(self, frame):
+        # Calculate the new position of the point
+        x, y = self.system.update_position()
+        # Update the position of the point on the plot
+        self.scatter.set_offsets(np.column_stack((x, y)))
+
+        # Return the point object
+        return self.scatter,
+    def plot(self):
+
+        # # Create the point object
+        # point, = ax.plot(x, y, marker='o', markersize=10, color='red')
+
+        # Create the animation object
+        na = 13
+        self.fig, self.ax = plt.subplots()
+        self.ax.set_xlim(-10**na, 10**na)
+        self.ax.set_ylim(-10**na, 10**na)
+        self.x = np.array([])
+        self.y = np.array([])
+        self.scatter = self.ax.scatter([], [])
+        self.system = SolarSystem()
+        self.system.add_planets()
+
+        self.animation = FuncAnimation(self.fig, self.update, frames=10000, interval=200)
+        self.paused = False
+
+        self.fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
+
+        # Show the plot
         plt.show()
-        # self.images.append(im)
-        # Display the plot
 
-        # plt.pause(0.5)
-        # im = plt.
-
-
-    def run(self):
-        for _ in range(100):
-            self.plot_everything()
-            self.update_position()
-            # print(self.planets[0].position)
+    def toggle_pause(self, *args, **kwargs):
+        if self.paused:
+            self.animation.resume()
+        else:
+            self.animation.pause()
+        self.paused = not self.paused
 
 
 
@@ -247,9 +308,11 @@ class SolarSystem:
 #     p.position += s
 #     print(p.position)
 
-system = SolarSystem()
-system.add_planets()
-# system.update_position()
-# system.plot_everything()
-system.run()
+# system = SolarSystem()
+# system.add_planets()
+# # system.update_position()
+# # system.plot_everything()
+# system.run()
+animation = Animation()
+animation.plot()
 
