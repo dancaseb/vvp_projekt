@@ -15,7 +15,7 @@ class Planet:
         self._force = np.array([0.0, 0.0])
         self._velocity = velocity
         self.forces = []
-        self.dt = 60*60*24
+        self.dt = 60*60*24*7
 
     @property
     def position(self):
@@ -78,6 +78,12 @@ class Planet:
         self.velocity = v
         s = self.calculate_distance(self.velocity, a)
         self.position += s
+        if self.name == 'Mercury':
+            print(f"force of merkury {np.linalg.norm(self.force) /1000}")
+            print(f"velocity of merkury {np.linalg.norm(self.velocity) /1000}")
+            print(f"acceleration of merkury {np.linalg.norm(a) /1000}")
+            print(f"position of merkury {self.position}")
+            print("**************")
         # print(f"position {self.position}")
 
         # print(f"velocity {self.velocity}")
@@ -90,13 +96,16 @@ class Planet:
 
     def calculate_velocity(self, acceleration):
         # mozna blbe? to znamena, ze se porad zrychluje, idk
-        v = acceleration * self.dt + self.velocity
+        # v = acceleration * self.dt + self.velocity
+        # konst. rychlost na intervalu dt
+        dv = acceleration * self.dt  # zmena rychlosti behem dt
+        v = self.velocity + dv
         return v
 
     def calculate_distance(self, velocity, acceleration):
-        # s = velocity * self.dt
-        s = 0.5 * acceleration * self.dt**2 + velocity * self.dt
-        return s
+        ds = velocity * self.dt
+        # s = 0.5 * acceleration * self.dt**2 + velocity * self.dt
+        return ds
 
 
 
