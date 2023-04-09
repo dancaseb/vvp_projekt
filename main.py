@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import time
 from constants import G
 import numpy as np
-from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
 import json
 class Planet:
     def __init__(self, mass, position, velocity, name):
@@ -16,6 +16,7 @@ class Planet:
         self._velocity = velocity
         self.forces = []
         self.dt = 60*60*24*7
+        self.positions = [tuple(self._position)]
 
     @property
     def position(self):
@@ -78,14 +79,15 @@ class Planet:
         self.velocity = v
         s = self.calculate_distance(self.velocity, a)
         self.position += s
-        if self.name == 'Mercury':
-            print(f"force of merkury {np.linalg.norm(self.force) /1000}")
-            print(f"velocity of merkury {np.linalg.norm(self.velocity) /1000}")
-            print(f"acceleration of merkury {np.linalg.norm(a) /1000}")
-            print(f"position of merkury {self.position}")
-            print("**************")
+        # if self.name == 'Mercury':
+        #     print(f"force of merkury {np.linalg.norm(self.force) /1000}")
+        #     print(f"velocity of merkury {np.linalg.norm(self.velocity) /1000}")
+        #     print(f"acceleration of merkury {np.linalg.norm(a) /1000}")
+        #     print(f"position of merkury {self.position}")
+        #     print("**************")
         # print(f"position {self.position}")
-
+        # append the new position, used for plotting trajectory
+        self.positions.append(tuple(self.position))
         # print(f"velocity {self.velocity}")
         self.forces.clear()
         # print(f"position {self.position}")
@@ -190,8 +192,13 @@ class SolarSystem:
 
         x = np.array([p.position[0] for p in self.planets])
         y = np.array([p.position[1] for p in self.planets])
+        # print(self.planets[1].positions)
+        # positions = np.array([planet.positions for planet in self.planets])
+        # print(f"positions: {[x for x in positions]}")
+        # x = np.array([position[0] for position in positions])
+        # y = np.array([position[1] for position in positions])
         return x, y
-
+        # return positions
 
 
 
@@ -240,10 +247,10 @@ class Animation:
         # Calculate the new position of the point
         x, y = self.system.update_position()
         # Update the position of the point on the plot
-        self.scatter.set_offsets(np.column_stack((x, y)))
-
+        self.plotting_graph.set_offsets(np.column_stack((x, y)))
+        # self.plotting_graph.set_data(x, y)
         # Return the point object
-        return self.scatter,
+        return self.plotting_graph,
     def plot(self):
 
         # # Create the point object
@@ -256,17 +263,21 @@ class Animation:
         self.ax.set_ylim(-10**na, 10**na)
         self.x = np.array([])
         self.y = np.array([])
-        self.scatter = self.ax.scatter([], [])
+        self.plotting_graph = self.ax.scatter([], [])
         # self.system = SolarSystem()
         # self.system.add_planets()
 
-        self.animation = FuncAnimation(self.fig, self.update, frames=1000, interval=200)
+        self.animation = animation.FuncAnimation(self.fig, self.update, frames=60, interval=5)
         self.paused = False
 
         self.fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
 
         # Show the plot
         plt.show()
+        # FFwriter = animation.FFMpegWriter(codec='avi')
+        # self.animation.save("video.gif")
+        # writervideo = animation.FFMpegWriter(fps=60)
+        # self.animation.save('increasingStraightLine.mp4', writer=writervideo)
 
     def toggle_pause(self, *args, **kwargs):
         if self.paused:
