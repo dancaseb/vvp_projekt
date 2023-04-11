@@ -378,6 +378,6 @@ from my_module import Manager
 # tk backend opens a new interactive window
 # %matplotlib tk
 # run the calculations
-manager = Manager("data/test.json")
+manager = Manager("data/planets.json")
 manager.run()
 

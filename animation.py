@@ -18,6 +18,7 @@ class Animation:
         self.x = np.array([])
         self.y = np.array([])
         self.graph, = self.ax.plot([], [])
+        # self.scatter_graph = self.ax2.scatter([], [])
     def init(self):
         self.trajectories_plots.clear()
         # for each planet we create own plot
@@ -30,9 +31,9 @@ class Animation:
     # Define the update function for the animation
     def update(self, frame):
         # Calculate the new positions of the planets
-        x,y = self.system.update_position()
+        x, y = self.system.update_position()
         # Update the positions in the plot graph
-        # self.graph.set_offsets(np.column_stack((x, y)))
+        # self.scatter_graph.set_offsets(np.column_stack((x, y)))
         # self.graph.set_data()
         # line_segments = LineCollection(self.system.get_planets_trajecotires(), linewidths=(0.5, 1, 1.5, 2), linestyle='solid')
         # self.ax.add_collection(line_segments)
@@ -45,13 +46,12 @@ class Animation:
         for index, trajectory_plot in enumerate(self.trajectories_plots):
             trajectory_plot.set_data(xlist[index], ylist[index])  # set data for each line separately.
 
-        # return graph
         return self.trajectories_plots
     def plot(self):
         # self.graph = self.ax.plot([], [], 'o',ls='-', ms=8,markevery=[-1])
         # self.trajectory_graph = self.ax2.plot()
 
-        self.animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init, frames=1000000, interval=5, blit=True, repeat=False)
+        self.animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init, frames=1000000, interval=20, repeat=True)
         self.paused = False
 
         self.fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
