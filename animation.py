@@ -23,9 +23,13 @@ class Animation:
         self.trajectories_plots.clear()
         # for each planet we create own plot
         planets_num = len(self.system.planets)
+        # trajectory plots, ls='-' specifies the line style
         for _ in range(planets_num):
-            obj, = self.ax.plot([], [], 'bo', ls='-', ms=8, markevery=[-1])
-            self.trajectories_plots.append(obj)
+            one_planet_trajectory, = self.ax.plot([], [], 'g', ls='-', ms=8, markevery=[-1])
+            self.trajectories_plots.append(one_planet_trajectory)
+
+        scatter_plot_planets, = self.ax.plot([], [], 'o', color='blue')
+        self.trajectories_plots.append(scatter_plot_planets)
 
         return self.trajectories_plots
     # Define the update function for the animation
@@ -42,6 +46,9 @@ class Animation:
         # lists of x and y coordinates to plot
         xlist = [[position[0] for position in trajectory] for trajectory in trajectories]
         ylist = [[position[1] for position in trajectory] for trajectory in trajectories]
+
+        xlist.append(x)
+        ylist.append(y)
 
         for index, trajectory_plot in enumerate(self.trajectories_plots):
             trajectory_plot.set_data(xlist[index], ylist[index])  # set data for each line separately.
