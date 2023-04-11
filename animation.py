@@ -59,6 +59,9 @@ class Animation:
         update function is a required parameter for FuncAnimation. We must update the frames. This finds the updates
         position of planets.
 
+        Inspiration for the animation of multiple plot lines was taken from here: https://stackoverflow.com/a/23065440
+        Documentation for FuncAnimation: https://matplotlib.org/stable/api/_as_gen/matplotlib.animation.FuncAnimation.html
+        Examples of FuncAnimation usage: https://matplotlib.org/stable/api/animation_api.html
         :param frame:
         :return:
         """
