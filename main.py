@@ -371,6 +371,13 @@ class Manager:
 # # system.update_position()
 # # system.plot_everything()
 # system.run()
-manager = Manager()
+# manager = Manager()
+# manager.run()
+
+from my_module import Manager
+# tk backend opens a new interactive window
+# %matplotlib tk
+# run the calculations
+manager = Manager("data/test.json")
 manager.run()
 
