@@ -4,64 +4,97 @@ import matplotlib.animation as animation
 
 
 class Animation:
-
+    """
+    Animation class used for animating the object movement. Takes SolarSystem object as parameter. The __init__ function
+    creates the base figure with xlim and ylim. The animation will be a sequence of these figures.
+    """
     def __init__(self, solar_system):
         self.system = solar_system
         self.trajectories_plots = []
 
-        # Create the animation object
-        na = 13
+        # Create the figure object and axes
+        power = 13
         self.fig, self.ax = plt.subplots()
-        self.ax.set_xlim(-10**na, 10**na)
-        self.ax.set_ylim(-10**na, 10**na)
-        # self.ax2 = self.ax.twinx()
+        self.ax.set_xlim(-10**power, 10**power)
+        self.ax.set_ylim(-10**power, 10**power)
         self.x = np.array([])
         self.y = np.array([])
-        self.graph, = self.ax.plot([], [])
-        # self.scatter_graph = self.ax2.scatter([], [])
-    def init(self):
+        # I guess this is not needed
+        # self.graph, = self.ax.plot([], [])
+        self.paused = False
+        self.planets_animation = None
+
+    def init_animation(self):
+        """
+        Initialize animation. This function is a parameter to the FuncAnimation. init_function is called every time
+        the animation is repeated.
+        :return:
+        """
+        #
+        try:
+            self.trajectories_plots[-1].remove()
+        except IndexError:
+            pass
         self.trajectories_plots.clear()
-        # for each planet we create own plot
+
         planets_num = len(self.system.planets)
+        # for each planet we create own plot and store it in trajectories_plots
         # trajectory plots, ls='-' specifies the line style
         for _ in range(planets_num):
-            one_planet_trajectory, = self.ax.plot([], [], 'g', ls='-', ms=8, markevery=[-1])
+            one_planet_trajectory, = self.ax.plot([], [], 'g', ls='-')
             self.trajectories_plots.append(one_planet_trajectory)
 
-        scatter_plot_planets, = self.ax.plot([], [], 'o', color='blue')
-        self.trajectories_plots.append(scatter_plot_planets)
+        # Single point plot representing the actual planet. I didn't parametrize the one_planet_trajectory to plot
+        # a point in the end of trajectory, because when the animation was reset, the point stayed in the plot. Having a
+        # different plot for the actual planet, we can easily remove it when resetting the animation.
+        plot_planet_point, = self.ax.plot([], [], 'o', color='blue')
+        self.trajectories_plots.append(plot_planet_point)
 
+        # return a list of plots
         return self.trajectories_plots
-    # Define the update function for the animation
+
+
     def update(self, frame):
+        """
+        update function is a required parameter for FuncAnimation. We must update the frames. This finds the updates
+        position of planets.
+
+        :param frame:
+        :return:
+        """
         # Calculate the new positions of the planets
         x, y = self.system.update_position()
-        # Update the positions in the plot graph
-        # self.scatter_graph.set_offsets(np.column_stack((x, y)))
-        # self.graph.set_data()
-        # line_segments = LineCollection(self.system.get_planets_trajecotires(), linewidths=(0.5, 1, 1.5, 2), linestyle='solid')
-        # self.ax.add_collection(line_segments)
-        # The trajectory graphs
+
+        # Fetch the trajectories of all planets saved in a list
         trajectories = self.system.get_planets_trajectories()
-        # lists of x and y coordinates to plot
+        # lists of x and y coordinates to plot the trajectories
         xlist = [[position[0] for position in trajectory] for trajectory in trajectories]
         ylist = [[position[1] for position in trajectory] for trajectory in trajectories]
 
+        # Add x,y coordinates for the planets actual position.
+        # At this position a circle representing the planet will be plotted
         xlist.append(x)
         ylist.append(y)
 
+        # set data for each plot separately.
         for index, trajectory_plot in enumerate(self.trajectories_plots):
-            trajectory_plot.set_data(xlist[index], ylist[index])  # set data for each line separately.
+            trajectory_plot.set_data(xlist[index], ylist[index])
 
+        # return the list of plots
         return self.trajectories_plots
-    def plot(self):
-        # self.graph = self.ax.plot([], [], 'o',ls='-', ms=8,markevery=[-1])
-        # self.trajectory_graph = self.ax2.plot()
 
-        self.animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init, frames=1000000, interval=20, repeat=True)
-        self.paused = False
+    def start_animation(self):
+        """
+        Function to start the animation. This is done by the FuncAnimation from matplotlib.animation module.
+        After exiting the animation is saved.
+        :return:
+        """
 
-        self.fig.canvas.mpl_connect('button_press_event', self.toggle_pause)
+        self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
+                                                         frames=60, interval=20, repeat=True)
+
+        # when clicking on figure the animation stops
+        self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
 
         # Show the plot
         plt.show()
@@ -70,9 +103,10 @@ class Animation:
         # writervideo = animation.FFMpegWriter(fps=60)
         # self.animation.save('increasingStraightLine.mp4', writer=writervideo)
 
-    def toggle_pause(self, *args, **kwargs):
+    def _toggle_pause(self, *args, **kwargs):
+        # internal function, pauses and resumes animation when clicked on figure
         if self.paused:
-            self.animation.resume()
+            self.planets_animation.resume()
         else:
-            self.animation.pause()
+            self.planets_animation.pause()
         self.paused = not self.paused

@@ -374,7 +374,7 @@ class Manager:
 # manager = Manager()
 # manager.run()
 
-from my_module import Manager
+from planet_project import Manager
 # tk backend opens a new interactive window
 # %matplotlib tk
 # run the calculations
