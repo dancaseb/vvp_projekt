@@ -1,4 +1,4 @@
-from constants import G, planet_colors
+from planet_project.constants import G, planet_colors
 import numpy as np
 import itertools
 

@@ -5,7 +5,7 @@ import random
 import string
 
 import numpy as np
-from constants import G
+from planet_project.constants import G
 
 
 class Loader:
