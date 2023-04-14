@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+# you must install ffmpeg to run this code
+plt.rcParams['animation.ffmpeg_path'] = 'C:\\Users\\Dano\\Downloads\\ffmpeg-master-latest-win64-gpl\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe'
+
 import matplotlib.animation as animation
 
 import universe
@@ -94,17 +97,21 @@ class Animation:
         """
 
         self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
-                                                         frames=1000, interval=20, repeat=True)
+                                                         frames=100, interval=20, repeat=True)
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
 
         # Show the plot
         plt.show()
-        # FFwriter = animation.FFMpegWriter(codec='avi')
-        self.planets_animation.save("video.gif")
-        # writervideo = animation.FFMpegWriter(fps=60)
-        # self.animation.save('increasingStraightLine.mp4', writer=writervideo)
+
+        # save video using FFMpeg
+        writer = animation.FFMpegWriter(fps=10)
+        # Save the animation as a video file
+        self.planets_animation.save("video.mp4", writer=writer)
+
+        # If you don't have FFMpeg installed uncomment this line and comment the lines above
+        # self.planets_animation.save("video.gif", fps=10)
 
     def _toggle_pause(self, *args, **kwargs):
         # internal function, pauses and resumes animation when clicked on figure

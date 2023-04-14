@@ -75,7 +75,6 @@ class Loader:
     def load_data_from_json(self):
         with open(self.path) as file:
             data = json.loads(file.read())
-        print(data)
         return data
 
 
