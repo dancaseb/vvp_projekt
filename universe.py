@@ -24,6 +24,7 @@ class Planet:
         self.forces = []
         self.dt = 60*60*24
         self.positions = [tuple(self._position)]
+        self.planet_plot = self.PlanetPlot(self)
 
     @property
     def position(self):
@@ -137,6 +138,17 @@ class Planet:
         ds = self.velocity * self.dt
         return ds
 
+    class PlanetPlot:
+        """
+        Inner class of Planet which will be passed to the plotting animation.
+        """
+        def __init__(self, planet):
+            self.name = planet.name
+            self.position = planet.position
+            self.positions = planet.positions
+
+
+
 
 class SolarSystem:
     """
@@ -218,5 +230,6 @@ class SolarSystem:
         Get the planets trajectory. Each planet holds a list containing its previous positions. Used for plotting.
         :return:
         """
+        # vratit objekty na vykreslovani
         trajectories = np.array([p.positions for p in self.planets])
         return trajectories

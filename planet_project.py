@@ -6,6 +6,8 @@ import string
 
 import numpy as np
 from constants import G
+
+
 class Loader:
     """
     Class responsible for the loading of json files with data. Accepts parameter path (path to the data). Actual loading
