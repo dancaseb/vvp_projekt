@@ -6,7 +6,7 @@ class Planet:
     """
     Class representing a planet. Initializing parameters are mass, position, velocity and name.
     """
-    def __init__(self, mass, position, velocity, name):
+    def __init__(self, mass: float, position: np.ndarray, velocity: np.ndarray, name: str):
         """
         # Initialize values. Acceleration and force/forces will be calculated. dt is the time step. positions are the
         past positions the planet was at. Using properties to set and get values.
@@ -31,6 +31,7 @@ class Planet:
 
     @position.setter
     def position(self, new_position):
+        # prepsat na shape
         if not isinstance(new_position, np.ndarray):
             raise AssertionError('Position must be a element tuple.')
         if len(new_position) != 2:
@@ -84,6 +85,8 @@ class Planet:
         ds = self.calculate_distance(self.velocity)
         # add the change to previous position
         self.position += ds
+        # if self.name == 'Mercury':
+        #     print(self.position)
         # append the new position, used for plotting trajectory
         self.positions.append(tuple(self.position))
         self.forces.clear()
