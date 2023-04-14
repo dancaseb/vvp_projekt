@@ -148,15 +148,15 @@ class Planet:
 
     class PlanetPlot:
         """
-        Inner class of Planet which will be passed to the plotting animation.
+        Inner class of Planet which will be passed to the plotting animation. Contains only the necessary information
+        used for plotting.
         """
         def __init__(self, planet):
             self.name = planet.name
+            self.color = planet.color
+            self.mass = planet.mass
             self.position = planet.position
             self.positions = planet.positions
-            self.color = planet.color
-
-
 
 
 class SolarSystem:

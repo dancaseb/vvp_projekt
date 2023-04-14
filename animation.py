@@ -17,19 +17,16 @@ class Animation:
         self.system = solar_system
         self.trajectories_plots = []
         self.planets_plot = []
-
+        self.plots = []
+        self.background = plt.imread('background_space.png')
         # Create the figure object and axes
-        power = 13
         self.fig, self.ax = plt.subplots()
-        self.ax.set_xlim(-10**power, 10**power)
-        self.ax.set_ylim(-10**power, 10**power)
-        self.x = np.array([])
-        self.y = np.array([])
-        # I guess this is not needed
-        # self.graph, = self.ax.plot([], [])
+        self.ax.set_xlim(-5e12, 5e12)
+        self.ax.set_ylim(-5e12, 5e12)
+        # self.ax.set_facecolor('black')
         self.paused = False
         self.planets_animation = None
-        self.plots = []
+
 
     def init_animation(self) -> list[plt.Axes.plot]:
         """
@@ -57,7 +54,6 @@ class Animation:
             # Having a different plot for the actual planet, we can easily remove it when resetting the animation.
             plot_planet, = self.ax.plot([], [], 'o', color='blue')
             self.planets_plot.append(plot_planet)
-
         # list of all plots. trajectories and planets
         self.plots = self.trajectories_plots + self.planets_plot
 
@@ -90,10 +86,14 @@ class Animation:
         x = np.array([planet.position[0] for planet in planet_plots])
         y = np.array([planet.position[1] for planet in planet_plots])
         colors = [planet.color for planet in planet_plots]
+        masses = np.array([planet.mass for planet in planet_plots])
+        masses_scaled = np.interp(masses, (min(masses), max(masses)), (4, 15))
+        masses[0] = 20
         # set data for each planet plot separately.
         for index, planet_plot in enumerate(self.planets_plot):
             planet_plot.set_data(x[index], y[index])
             planet_plot.set_color(colors[index])
+            planet_plot.set_markersize(masses_scaled[index])
 
         # list of all plots. trajectories and planets
         self.plots = self.trajectories_plots + self.planets_plot
@@ -113,7 +113,7 @@ class Animation:
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
-
+        plt.imshow(self.background, extent=[-5e12, 5e12, -5e12, 5e12])
         # Show the plot
         plt.show()
 
