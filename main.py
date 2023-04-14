@@ -388,3 +388,9 @@ from planet_project import Manager
 # run the calculations
 manager = Manager("data/planets.json")
 manager.run()
+# import numpy as np
+# from universe import Planet
+#
+# p = Planet('23', [3],3,4)
+# p.position = np.array([2,2])
+

@@ -30,11 +30,11 @@ class Planet:
         return self._position
 
     @position.setter
-    def position(self, new_position):
-        # prepsat na shape
+    def position(self, new_position: np.ndarray):
         if not isinstance(new_position, np.ndarray):
-            raise AssertionError('Position must be a element tuple.')
-        if len(new_position) != 2:
+            raise AssertionError('Position must be ndarray type.')
+        if new_position.shape != (2,):
+            print(new_position.shape)
             raise AssertionError('Position must contain 2 elements for x and y axis.')
         self._position = new_position
 
@@ -43,7 +43,12 @@ class Planet:
         return self._acceleration
 
     @acceleration.setter
-    def acceleration(self, new_acceleration):
+    def acceleration(self, new_acceleration: np.ndarray):
+        if not isinstance(new_acceleration, np.ndarray):
+            raise AssertionError('Acceleration must be ndarray type.')
+        if new_acceleration.shape != (2,):
+            print(new_acceleration.shape)
+            raise AssertionError('Acceleration must contain 2 elements for x and y axis.')
         self._acceleration = new_acceleration
 
     @property
@@ -51,7 +56,12 @@ class Planet:
         return self._force
 
     @force.setter
-    def force(self, new_force):
+    def force(self, new_force: np.ndarray):
+        if not isinstance(new_force, np.ndarray):
+            raise AssertionError('Force must be ndarray type.')
+        if new_force.shape != (2,):
+            print(new_force.shape)
+            raise AssertionError('Force must contain 2 elements for x and y axis.')
         self._force = new_force
 
     @property
@@ -59,7 +69,7 @@ class Planet:
         return self._mass
 
     @mass.setter
-    def mass(self, new_mass):
+    def mass(self, new_mass: float):
         self._mass = new_mass
 
     @property
@@ -67,7 +77,12 @@ class Planet:
         return self._velocity
 
     @velocity.setter
-    def velocity(self, new_velocity):
+    def velocity(self, new_velocity: np.ndarray):
+        if not isinstance(new_velocity, np.ndarray):
+            raise AssertionError('Velocity must be ndarray type.')
+        if new_velocity.shape != (2,):
+            print(new_velocity.shape)
+            raise AssertionError('Velocity must contain 2 elements for x and y axis.')
         self._velocity = new_velocity
 
     def calculate_position(self):
@@ -91,7 +106,7 @@ class Planet:
         self.positions.append(tuple(self.position))
         self.forces.clear()
 
-    def calculate_acceleration(self, force):
+    def calculate_acceleration(self, force: np.ndarray) -> np.ndarray:
         """
         Calculates the planet's vector of acceleration using the formula a = F/m
         :param force:
@@ -100,7 +115,7 @@ class Planet:
         a = force / self.mass
         return a
 
-    def calculate_velocity(self, acceleration):
+    def calculate_velocity(self, acceleration: np.ndarray) -> np.ndarray:
         """
         Calculates the planet's vector of velocity using the formula v = a * t. The velocity is constant during interval
         dt, dv is change of velocity during time dt
@@ -111,7 +126,7 @@ class Planet:
         v = self.velocity + dv
         return v
 
-    def calculate_distance(self, velocity):
+    def calculate_distance(self, velocity: np.ndarray) -> np.ndarray:
         """
         Calculates the planet's vector of change in distance using the formula s = v * t.
         :param velocity:
@@ -130,7 +145,7 @@ class SolarSystem:
     def __init__(self):
         self.planets = []
 
-    def distance_vector(self, pos1, pos2):
+    def distance_vector(self, pos1: np.ndarray, pos2: np.ndarray) -> np.ndarray:
         """
         Find the vector difference. We use it with position arguments pos1 and pos2
         :param pos1:
@@ -139,7 +154,7 @@ class SolarSystem:
         """
         return pos2 - pos1
 
-    def unit_vector(self, vector):
+    def unit_vector(self, vector: np.ndarray) -> np.ndarray:
         """
         Calculate the unit vector for a given vector.
         :param vector:
@@ -159,7 +174,7 @@ class SolarSystem:
                        velocity=np.array(planets[planet_name]['velocity']),
                        mass=planets[planet_name]['mass'], name=planet_name))
 
-    def calculate_force(self, planet1, planet2):
+    def calculate_force(self, planet1: Planet, planet2: Planet) -> np.ndarray:
         """
         Calculate the force vector between two planets. Formula can be found at https://en.wikipedia.org/wiki/Force
         :param planet1:
@@ -171,8 +186,7 @@ class SolarSystem:
                     np.linalg.norm(self.distance_vector(planet1.position, planet2.position)) ** 2)
         return F
 
-
-    def update_position(self):
+    def update_position(self) -> tuple:
         """
         For planet1 calculate the force between another planet. Do this for all possible combinations. Then append
         the calculated force to the forces list for planet1. After the forces list has been updated, calculate new
@@ -196,8 +210,7 @@ class SolarSystem:
 
         return x, y
 
-    def get_planets_trajectories(self):
-        # prostor pro optimalizaci, nemusi se prekopirovat cele pole, ale pouze nejak appendovat.
+    def get_planets_trajectories(self) -> np.ndarray[tuple[np.ndarray]]:
         """
         Get the planets trajectory. Each planet holds a list containing its previous positions. Used for plotting.
         :return:

@@ -8,10 +8,10 @@ class Loader:
     Class responsible for the loading of json files with data. Accepts parameter path (path to the data). Actual loading
     is done using the load_data function.
     """
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path = path
 
-    def load_data(self):
+    def load_data(self) -> dict:
         """
         Loads json alike data and returns it as a dict.
         :return:
@@ -25,7 +25,7 @@ class Manager:
     """
     Manager class responsible for calling the loading, calculation and animation. Accepts parameter path (path to data)
     """
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.loader = Loader(path)
         self.system = SolarSystem()
         self.animation = Animation(self.system)

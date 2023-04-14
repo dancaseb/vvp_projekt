@@ -2,13 +2,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
 
+import universe
+
 
 class Animation:
     """
     Animation class used for animating the object movement. Takes SolarSystem object as parameter. The __init__ function
     creates the base figure with xlim and ylim. The animation will be a sequence of these figures.
     """
-    def __init__(self, solar_system):
+    def __init__(self, solar_system: universe.SolarSystem):
         self.system = solar_system
         self.trajectories_plots = []
 
@@ -24,7 +26,7 @@ class Animation:
         self.paused = False
         self.planets_animation = None
 
-    def init_animation(self):
+    def init_animation(self) -> list[plt.Axes.plot]:
         """
         Initialize animation. This function is a parameter to the FuncAnimation. init_function is called every time
         the animation is repeated.
@@ -53,8 +55,7 @@ class Animation:
         # return a list of plots
         return self.trajectories_plots
 
-
-    def update(self, frame):
+    def update(self, _):
         """
         update function is a required parameter for FuncAnimation. We must update the frames. This finds the updates
         position of planets.
@@ -62,7 +63,6 @@ class Animation:
         Inspiration for the animation of multiple plot lines was taken from here: https://stackoverflow.com/a/23065440
         Documentation for FuncAnimation: https://matplotlib.org/stable/api/_as_gen/matplotlib.animation.FuncAnimation.html
         Examples of FuncAnimation usage: https://matplotlib.org/stable/api/animation_api.html
-        :param frame:
         :return:
         """
         # Calculate the new positions of the planets
@@ -88,7 +88,7 @@ class Animation:
 
     def start_animation(self):
         """
-        Function to start the animation. This is done by the FuncAnimation from matplotlib.animation module.
+        Function to start the animation. This is done by the FuncAnimation from matplotlib.Animation module.
         After exiting the animation is saved.
         :return:
         """
