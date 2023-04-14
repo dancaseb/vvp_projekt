@@ -89,10 +89,11 @@ class Animation:
         # At this position a circle representing the planet will be plotted
         x = np.array([planet.position[0] for planet in planet_plots])
         y = np.array([planet.position[1] for planet in planet_plots])
+        colors = [planet.color for planet in planet_plots]
         # set data for each planet plot separately.
         for index, planet_plot in enumerate(self.planets_plot):
             planet_plot.set_data(x[index], y[index])
-            planet_plot.set_color('black')
+            planet_plot.set_color(colors[index])
 
         # list of all plots. trajectories and planets
         self.plots = self.trajectories_plots + self.planets_plot

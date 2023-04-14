@@ -1,12 +1,13 @@
-from constants import G
+from constants import G, planet_colors
 import numpy as np
+import itertools
 
 
 class Planet:
     """
     Class representing a planet. Initializing parameters are mass, position, velocity and name.
     """
-    def __init__(self, mass: float, position: np.ndarray, velocity: np.ndarray, name: str):
+    def __init__(self, mass: float, position: np.ndarray, velocity: np.ndarray, name: str, color: str):
         """
         # Initialize values. Acceleration and force/forces will be calculated. dt is the time step. positions are the
         past positions the planet was at. Using properties to set and get values.
@@ -16,6 +17,7 @@ class Planet:
         :param name:
         """
         self.name = name
+        self.color = color
         self._mass = mass
         self._position = position
         self._acceleration = np.array([0.0, 0.0])
@@ -152,6 +154,7 @@ class Planet:
             self.name = planet.name
             self.position = planet.position
             self.positions = planet.positions
+            self.color = planet.color
 
 
 
@@ -187,11 +190,13 @@ class SolarSystem:
         :param planets:
         :return:
         """
+        colors = itertools.cycle(planet_colors)
+
         for planet_name in planets:
             self.planets.append(
                 Planet(position=np.array(planets[planet_name]['position']),
                        velocity=np.array(planets[planet_name]['velocity']),
-                       mass=planets[planet_name]['mass'], name=planet_name))
+                       mass=planets[planet_name]['mass'], name=planet_name, color=next(colors)))
 
     def calculate_force(self, planet1: Planet, planet2: Planet) -> np.ndarray:
         """
@@ -205,7 +210,7 @@ class SolarSystem:
                     np.linalg.norm(self.distance_vector(planet1.position, planet2.position)) ** 2)
         return F
 
-    def update_position(self) -> tuple:
+    def update_position(self) -> list:
         """
         For planet1 calculate the force between another planet. Do this for all possible combinations. Then append
         the calculated force to the forces list for planet1. After the forces list has been updated, calculate new
@@ -219,25 +224,12 @@ class SolarSystem:
                     continue
                 else:
                     F = self.calculate_force(planet1, planet2)
-                    # print(planet1.name, np.linalg.norm(F), planet2.name)
 
                     planet1.forces.append(F)
 
         for planet in self.planets:
             planet.calculate_position()
 
-        x = np.array([p.position[0] for p in self.planets])
-        y = np.array([p.position[1] for p in self.planets])
-
         planet_plots = [p.planet_plot for p in self.planets]
 
         return planet_plots
-
-    def get_planets_trajectories(self) -> np.ndarray[tuple[np.ndarray]]:
-        """
-        Get the planets trajectory. Each planet holds a list containing its previous positions. Used for plotting.
-        :return:
-        """
-        # vratit objekty na vykreslovani
-        trajectories = np.array([p.positions for p in self.planets])
-        return trajectories
