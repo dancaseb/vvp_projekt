@@ -382,7 +382,7 @@
 # manager.run()
 #
 
-from planet_project import Simulation, Loader
+from planet_project.simulation import Simulation
 # tk backend opens a new interactive window
 
 # run the calculations
@@ -391,8 +391,12 @@ from planet_project import Simulation, Loader
 # manager = Simulation(planets_number=2)
 # manager.run()
 
-manager = Simulation(path='data/planets.json', dt=60*60*24)
-manager.run()
+# manager = Simulation(path='data/planets.json', dt=60*60*24)
+# manager.run()
+# simulation = Simulation(path="data/planets.json", dt=60*60*24*7)
+# simulation.run()
+simulation = Simulation(path="data/planets.json", dt=60*60*24*7)
+simulation.run()
 # import numpy as np
 # from universe import Planet
 #

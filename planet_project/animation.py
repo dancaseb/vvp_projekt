@@ -5,7 +5,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'C:\\Users\\Dano\\Downloads\\ffmpeg-mast
 
 import matplotlib.animation as animation
 
-import universe
+import planet_project.universe as universe
 
 
 class Animation:
@@ -20,10 +20,10 @@ class Animation:
         self.plots = []
         self.background = plt.imread('background_space.png')
         # Create the figure object and axes
-        self.fig, self.ax = plt.subplots()
+        self.fig, self.ax = plt.subplots(figsize=(8, 6))
         self.ax.set_xlim(-5e12, 5e12)
         self.ax.set_ylim(-5e12, 5e12)
-        # self.ax.set_facecolor('black')
+        self.ax.set_facecolor('black')
         self.paused = False
         self.planets_animation = None
 
@@ -113,7 +113,7 @@ class Animation:
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
-        plt.imshow(self.background, extent=[-5e12, 5e12, -5e12, 5e12])
+        # plt.imshow(self.background, extent=[-5e12, 5e12, -5e12, 5e12])
         # Show the plot
         plt.show()
 

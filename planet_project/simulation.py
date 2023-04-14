@@ -1,6 +1,6 @@
-from animation import Animation
+from planet_project.animation import Animation
 import json
-from universe import SolarSystem
+from planet_project.universe import SolarSystem
 import random
 import string
 
