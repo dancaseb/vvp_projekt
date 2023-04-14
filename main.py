@@ -382,15 +382,26 @@
 # manager.run()
 #
 
-from planet_project import Simulation
+from planet_project import Simulation, Loader
 # tk backend opens a new interactive window
 
 # run the calculations
-manager = Simulation("data/planets.json")
+# manager = Simulation(path='data/planets.json')
+# manager.run()
+# manager = Simulation(planets_number=2)
+# manager.run()
+
+manager = Simulation(path='data/planets.json')
 manager.run()
 # import numpy as np
 # from universe import Planet
 #
 # p = Planet('23', [3],3,4)
 # p.position = np.array([2,2])
+# loader = Loader(path='data/test.json')
+# data = loader.load_data()
+# print('test', data)
+# loader = Loader(planets_number=3)
+# data = loader.generate_random_data()
+# print('random', data)
 

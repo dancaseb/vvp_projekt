@@ -94,7 +94,7 @@ class Animation:
         """
 
         self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
-                                                         frames=60, interval=20, repeat=True)
+                                                         frames=1000, interval=20, repeat=True)
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
@@ -102,7 +102,7 @@ class Animation:
         # Show the plot
         plt.show()
         # FFwriter = animation.FFMpegWriter(codec='avi')
-        # self.animation.save("video.gif")
+        self.planets_animation.save("video.gif")
         # writervideo = animation.FFMpegWriter(fps=60)
         # self.animation.save('increasingStraightLine.mp4', writer=writervideo)
 

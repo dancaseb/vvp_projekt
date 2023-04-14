@@ -34,7 +34,7 @@ class Planet:
         if not isinstance(new_position, np.ndarray):
             raise AssertionError('Position must be ndarray type.')
         if new_position.shape != (2,):
-            print(new_position.shape)
+            # print(new_position.shape)
             raise AssertionError('Position must contain 2 elements for x and y axis.')
         self._position = new_position
 
@@ -47,7 +47,7 @@ class Planet:
         if not isinstance(new_acceleration, np.ndarray):
             raise AssertionError('Acceleration must be ndarray type.')
         if new_acceleration.shape != (2,):
-            print(new_acceleration.shape)
+            # print(new_acceleration.shape)
             raise AssertionError('Acceleration must contain 2 elements for x and y axis.')
         self._acceleration = new_acceleration
 
@@ -60,7 +60,7 @@ class Planet:
         if not isinstance(new_force, np.ndarray):
             raise AssertionError('Force must be ndarray type.')
         if new_force.shape != (2,):
-            print(new_force.shape)
+            # print(new_force.shape)
             raise AssertionError('Force must contain 2 elements for x and y axis.')
         self._force = new_force
 
@@ -81,7 +81,7 @@ class Planet:
         if not isinstance(new_velocity, np.ndarray):
             raise AssertionError('Velocity must be ndarray type.')
         if new_velocity.shape != (2,):
-            print(new_velocity.shape)
+            # print(new_velocity.shape)
             raise AssertionError('Velocity must contain 2 elements for x and y axis.')
         self._velocity = new_velocity
 
@@ -99,6 +99,8 @@ class Planet:
         ds = self.calculate_distance_traveled()
         # add the change to previous position
         self.position += ds
+        # print(self.name, self.position)
+        # print(self.velocity)
         # if self.name == 'Mercury':
         #     print(self.position)
         # append the new position, used for plotting trajectory
@@ -199,6 +201,8 @@ class SolarSystem:
                     continue
                 else:
                     F = self.calculate_force(planet1, planet2)
+                    # print(planet1.name, np.linalg.norm(F), planet2.name)
+
                     planet1.forces.append(F)
 
         for planet in self.planets:
