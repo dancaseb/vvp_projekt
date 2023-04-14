@@ -106,6 +106,8 @@ class Planet:
         #     print(self.position)
         # append the new position, used for plotting trajectory
         self.positions.append(tuple(self.position))
+        # keep the plotting image up to date
+        self.update_plot()
         self.forces.clear()
 
     def calculate_acceleration(self) -> np.ndarray:
@@ -137,6 +139,10 @@ class Planet:
 
         ds = self.velocity * self.dt
         return ds
+
+    def update_plot(self):
+        self.planet_plot.position = self.position
+        self.planet_plot.positions = self.positions
 
     class PlanetPlot:
         """
@@ -223,7 +229,9 @@ class SolarSystem:
         x = np.array([p.position[0] for p in self.planets])
         y = np.array([p.position[1] for p in self.planets])
 
-        return x, y
+        planet_plots = [p.planet_plot for p in self.planets]
+
+        return planet_plots
 
     def get_planets_trajectories(self) -> np.ndarray[tuple[np.ndarray]]:
         """

@@ -16,6 +16,7 @@ class Animation:
     def __init__(self, solar_system: universe.SolarSystem):
         self.system = solar_system
         self.trajectories_plots = []
+        self.planets_plot = []
 
         # Create the figure object and axes
         power = 13
@@ -28,6 +29,7 @@ class Animation:
         # self.graph, = self.ax.plot([], [])
         self.paused = False
         self.planets_animation = None
+        self.plots = []
 
     def init_animation(self) -> list[plt.Axes.plot]:
         """
@@ -35,28 +37,32 @@ class Animation:
         the animation is repeated.
         :return:
         """
-        #
-        try:
-            self.trajectories_plots[-1].remove()
-        except IndexError:
-            pass
+        # remove the plots before the start of animation and clear all list. We must start with empty lists to prevent
+        # unexpected behaviour
+        for plot in self.planets_plot:
+            plot.remove()
         self.trajectories_plots.clear()
+        self.planets_plot.clear()
+        self.plots.clear()
 
         planets_num = len(self.system.planets)
         # for each planet we create own plot and store it in trajectories_plots
         # trajectory plots, ls='-' specifies the line style
         for _ in range(planets_num):
-            one_planet_trajectory, = self.ax.plot([], [], 'g', ls='-')
+            one_planet_trajectory, = self.ax.plot([], [], 'gray', ls='-')
             self.trajectories_plots.append(one_planet_trajectory)
 
-        # Single point plot representing the actual planet. I didn't parametrize the one_planet_trajectory to plot
-        # a point in the end of trajectory, because when the animation was reset, the point stayed in the plot. Having a
-        # different plot for the actual planet, we can easily remove it when resetting the animation.
-        plot_planet_point, = self.ax.plot([], [], 'o', color='blue')
-        self.trajectories_plots.append(plot_planet_point)
+            # Single point plot representing the actual planet. I didn't parametrize the one_planet_trajectory to plot
+            # a point in the end of trajectory, because when the animation was reset, the point stayed in the plot.
+            # Having a different plot for the actual planet, we can easily remove it when resetting the animation.
+            plot_planet, = self.ax.plot([], [], 'o', color='blue')
+            self.planets_plot.append(plot_planet)
 
-        # return a list of plots
-        return self.trajectories_plots
+        # list of all plots. trajectories and planets
+        self.plots = self.trajectories_plots + self.planets_plot
+
+        # return an iterable with plots to the animation function
+        return self.plots
 
     def update(self, _):
         """
@@ -68,26 +74,31 @@ class Animation:
         Examples of FuncAnimation usage: https://matplotlib.org/stable/api/animation_api.html
         :return:
         """
-        # Calculate the new positions of the planets
-        x, y = self.system.update_position()
+        # Calculate the new positions of the planets and get the plotting ojects
+        planet_plots = self.system.update_position()
 
-        # Fetch the trajectories of all planets saved in a list
-        trajectories = self.system.get_planets_trajectories()
         # lists of x and y coordinates to plot the trajectories
-        xlist = [[position[0] for position in trajectory] for trajectory in trajectories]
-        ylist = [[position[1] for position in trajectory] for trajectory in trajectories]
+        xlist = [[position[0] for position in planet_plot.positions] for planet_plot in planet_plots]
+        ylist = [[position[1] for position in planet_plot.positions] for planet_plot in planet_plots]
 
-        # Add x,y coordinates for the planets actual position.
-        # At this position a circle representing the planet will be plotted
-        xlist.append(x)
-        ylist.append(y)
-
-        # set data for each plot separately.
+        # set data for each trajectory plot separately.
         for index, trajectory_plot in enumerate(self.trajectories_plots):
             trajectory_plot.set_data(xlist[index], ylist[index])
 
-        # return the list of plots
-        return self.trajectories_plots
+        # x,y coordinates for the planets actual position.
+        # At this position a circle representing the planet will be plotted
+        x = np.array([planet.position[0] for planet in planet_plots])
+        y = np.array([planet.position[1] for planet in planet_plots])
+        # set data for each planet plot separately.
+        for index, planet_plot in enumerate(self.planets_plot):
+            planet_plot.set_data(x[index], y[index])
+            planet_plot.set_color('black')
+
+        # list of all plots. trajectories and planets
+        self.plots = self.trajectories_plots + self.planets_plot
+
+        # return an iterable with plots to the animation function
+        return self.plots
 
     def start_animation(self):
         """
@@ -105,10 +116,10 @@ class Animation:
         # Show the plot
         plt.show()
 
-        # save video using FFMpeg
-        writer = animation.FFMpegWriter(fps=10)
-        # Save the animation as a video file
-        self.planets_animation.save("video.mp4", writer=writer)
+        # # save video using FFMpeg
+        # writer = animation.FFMpegWriter(fps=10)
+        # # Save the animation as a video file
+        # self.planets_animation.save("video.mp4", writer=writer)
 
         # If you don't have FFMpeg installed uncomment this line and comment the lines above
         # self.planets_animation.save("video.gif", fps=10)
