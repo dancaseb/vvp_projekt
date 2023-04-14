@@ -382,11 +382,11 @@
 # manager.run()
 #
 
-from planet_project import Manager
+from planet_project import Simulation
 # tk backend opens a new interactive window
 
 # run the calculations
-manager = Manager("data/planets.json")
+manager = Simulation("data/planets.json")
 manager.run()
 # import numpy as np
 # from universe import Planet

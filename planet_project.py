@@ -21,7 +21,7 @@ class Loader:
         return data
 
 
-class Manager:
+class Simulation:
     """
     Manager class responsible for calling the loading, calculation and animation. Accepts parameter path (path to data)
     """
