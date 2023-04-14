@@ -92,12 +92,11 @@ class Planet:
         """
         # vector sum of force vectors
         self.force = np.add.reduce(self.forces)
-        a = self.calculate_acceleration(self.force)
+        self.acceleration = self.calculate_acceleration()
         # new velocity
-        v = self.calculate_velocity(a)
-        self.velocity = v
+        self.velocity = self.calculate_velocity()
         # change in position
-        ds = self.calculate_distance(self.velocity)
+        ds = self.calculate_distance_traveled()
         # add the change to previous position
         self.position += ds
         # if self.name == 'Mercury':
@@ -106,34 +105,34 @@ class Planet:
         self.positions.append(tuple(self.position))
         self.forces.clear()
 
-    def calculate_acceleration(self, force: np.ndarray) -> np.ndarray:
+    def calculate_acceleration(self) -> np.ndarray:
         """
         Calculates the planet's vector of acceleration using the formula a = F/m
         :param force:
         :return:
         """
-        a = force / self.mass
+        a = self.force / self.mass
         return a
 
-    def calculate_velocity(self, acceleration: np.ndarray) -> np.ndarray:
+    def calculate_velocity(self) -> np.ndarray:
         """
         Calculates the planet's vector of velocity using the formula v = a * t. The velocity is constant during interval
         dt, dv is change of velocity during time dt
         :param acceleration:
         :return:
         """
-        dv = acceleration * self.dt
+        dv = self.acceleration * self.dt
         v = self.velocity + dv
         return v
 
-    def calculate_distance(self, velocity: np.ndarray) -> np.ndarray:
+    def calculate_distance_traveled(self) -> np.ndarray:
         """
         Calculates the planet's vector of change in distance using the formula s = v * t.
         :param velocity:
         :return:
         """
 
-        ds = velocity * self.dt
+        ds = self.velocity * self.dt
         return ds
 
 
