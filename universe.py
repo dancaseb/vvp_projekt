@@ -7,7 +7,7 @@ class Planet:
     """
     Class representing a planet. Initializing parameters are mass, position, velocity and name.
     """
-    def __init__(self, mass: float, position: np.ndarray, velocity: np.ndarray, name: str, color: str):
+    def __init__(self, mass: float, position: np.ndarray, velocity: np.ndarray, dt: int, name: str, color: str):
         """
         # Initialize values. Acceleration and force/forces will be calculated. dt is the time step. positions are the
         past positions the planet was at. Using properties to set and get values.
@@ -24,7 +24,7 @@ class Planet:
         self._force = np.array([0.0, 0.0])
         self._velocity = velocity
         self.forces = []
-        self.dt = 60*60*24
+        self.dt = dt
         self.positions = [tuple(self._position)]
         self.planet_plot = self.PlanetPlot(self)
 
@@ -164,8 +164,9 @@ class SolarSystem:
     Class representing the Solar System with multiple planets. Doesn't take any parameters. Instead, the planets are
     added via the add_planets() function.
     """
-    def __init__(self):
+    def __init__(self, dt):
         self.planets = []
+        self.dt = dt
 
     def distance_vector(self, pos1: np.ndarray, pos2: np.ndarray) -> np.ndarray:
         """
@@ -196,7 +197,7 @@ class SolarSystem:
             self.planets.append(
                 Planet(position=np.array(planets[planet_name]['position']),
                        velocity=np.array(planets[planet_name]['velocity']),
-                       mass=planets[planet_name]['mass'], name=planet_name, color=next(colors)))
+                       mass=planets[planet_name]['mass'], dt=self.dt, name=planet_name, color=next(colors)))
 
     def calculate_force(self, planet1: Planet, planet2: Planet) -> np.ndarray:
         """

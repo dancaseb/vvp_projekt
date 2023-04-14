@@ -391,7 +391,7 @@ from planet_project import Simulation, Loader
 # manager = Simulation(planets_number=2)
 # manager.run()
 
-manager = Simulation(path='data/planets.json')
+manager = Simulation(path='data/planets.json', dt=60*60*24)
 manager.run()
 # import numpy as np
 # from universe import Planet

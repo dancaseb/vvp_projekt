@@ -87,8 +87,9 @@ class Simulation:
     """
 
     def __init__(self, **kwargs):
+        dt = kwargs.get('dt')
         self.loader = Loader(**kwargs)
-        self.system = SolarSystem()
+        self.system = SolarSystem(dt)
         self.animation = Animation(self.system)
 
     def run(self):
