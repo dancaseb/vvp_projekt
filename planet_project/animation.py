@@ -18,7 +18,9 @@ class Animation:
         self.trajectories_plots = []
         self.planets_plot = []
         self.plots = []
-        self.background = plt.imread('background_space.png')
+        self.background = []
+        self.stars_x = np.random.uniform(low=-5e12, high=5e12, size=500)
+        self.stars_y = np.random.uniform(low=-5e12, high=5e12, size=500)
         # Create the figure object and axes
         self.fig, self.ax = plt.subplots(figsize=(8, 6))
         self.ax.set_xlim(-5e12, 5e12)
@@ -26,7 +28,6 @@ class Animation:
         self.ax.set_facecolor('black')
         self.paused = False
         self.planets_animation = None
-
 
     def init_animation(self) -> list[plt.Axes.plot]:
         """
@@ -41,6 +42,7 @@ class Animation:
         self.trajectories_plots.clear()
         self.planets_plot.clear()
         self.plots.clear()
+        self.background.clear()
 
         planets_num = len(self.system.planets)
         # for each planet we create own plot and store it in trajectories_plots
@@ -54,8 +56,11 @@ class Animation:
             # Having a different plot for the actual planet, we can easily remove it when resetting the animation.
             plot_planet, = self.ax.plot([], [], 'o', color='blue')
             self.planets_plot.append(plot_planet)
+        background_stars = self.ax.plot(self.stars_x, self.stars_y, '.', markersize=1, color='white', alpha=0.5)
+        self.background.append(background_stars)
+
         # list of all plots. trajectories and planets
-        self.plots = self.trajectories_plots + self.planets_plot
+        self.plots = self.background + self.trajectories_plots + self.planets_plot
 
         # return an iterable with plots to the animation function
         return self.plots
@@ -96,7 +101,7 @@ class Animation:
             planet_plot.set_markersize(masses_scaled[index])
 
         # list of all plots. trajectories and planets
-        self.plots = self.trajectories_plots + self.planets_plot
+        self.plots = self.background + self.trajectories_plots + self.planets_plot
 
         # return an iterable with plots to the animation function
         return self.plots
@@ -116,7 +121,6 @@ class Animation:
         # plt.imshow(self.background, extent=[-5e12, 5e12, -5e12, 5e12])
         # Show the plot
         plt.show()
-
         # # save video using FFMpeg
         # writer = animation.FFMpegWriter(fps=10)
         # # Save the animation as a video file
