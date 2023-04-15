@@ -118,20 +118,20 @@ class Animation:
         """
 
         self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
-                                                         frames=100, interval=20, repeat=True)
+                                                         frames=1000, interval=20, repeat=True)
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
         # plt.imshow(self.background, extent=[-5e12, 5e12, -5e12, 5e12])
         # Show the plot
         plt.show()
-        # # save video using FFMpeg
-        # writer = animation.FFMpegWriter(fps=10)
-        # # Save the animation as a video file
-        # self.planets_animation.save("video.mp4", writer=writer)
+        # save video using FFMpeg
+        writer = animation.FFMpegWriter(fps=10)
+        # Save the animation as a video file
+        self.planets_animation.save("planets_simulation.mp4", writer=writer)
 
         # If you don't have FFMpeg installed uncomment this line and comment the lines above
-        # self.planets_animation.save("video.gif", fps=10)
+        # self.planets_animation.save("planets_simulation.gif", fps=10)
 
     def _toggle_pause(self, *args, **kwargs):
         # internal function, pauses and resumes animation when clicked on figure

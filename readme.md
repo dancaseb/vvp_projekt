@@ -20,7 +20,7 @@ pozici (position), rychlost (velocity), hmotnost (mass) a jméno (name). Tyto ho
 
 Kód spouštíme z root directory projektu (tedy vvp_planety). Nejdříve si musíme importovat
 třídu Simulation. Vytvoříme instanci třídy Simulation, na kterou poté zavoláme metodu run().
-Třída Simulation má 1 parametr dt, což je délka časového kroku. Defaultně je nastaven na hodnotu 60\*60\*24.
+Třída Simulation má 1 parametr dt, což je délka časového kroku. Defaultně je nastaven na hodnotu 60\*60\*24 (1 den).
 Třídě simulation musíme rovněž zadat parametr path, určující, kde se nachází json soubor s daty našich planet. 
 Třída simulation rovněž umožňuje zadat parametr planets_number. V tomto případě se 
 vygenerujou planety s náhodnými pozicemi, rychlostmi a hmotnostmi (Nejsou úplně náhodně, snažil jsem
@@ -35,10 +35,12 @@ Po spuštění metody run se zapne simulaci. Označením levým tlačítkem myš
 tlačítkem oddálit. Při kliknutí na animaci levým tlačítkem myši animaci pozastavíme a opět můžeme
 spustit levým tlačítkem myši.
 
-Po zavření animace se poslední animující objekt uloží do souboru **planets_simulation.mp4**.
+Po zavření animace se poslední animující objekt uloží do souboru **planets_simulation.mp4**. Uložení trvá asi 
+1 minutu a výsledná animace má délku 100 sekund.
+Pro uložení animace je potřeba mít nainstalovaný FFMPeg a upravit animation.ffmpeg_path parametr v samém souboru 
+(řešení pro windows -_-).
 
 V souboru example.ipynb můžete najít příklady použítí této knihovny.
-
 
 ## Zadání
 Tento projekt se zabývá simulací pohybu planet (těles) ve 2D prostoru
