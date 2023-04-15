@@ -20,7 +20,6 @@ class Loader:
         if self.path is None and self.planets_number is None:
             raise ValueError('You must provide path parameter or planets_number parameter to load data.')
 
-
     def load_data(self) -> dict:
         """
         Loads json alike data and returns it as a dict.
@@ -62,7 +61,7 @@ class Loader:
             # create a random name with random length for a planet
         return data
 
-    def generate_planet(self, data: dict, position: list, velocity: list, mass: float):
+    def generate_planet(self, data: dict, position: np.ndarray, velocity: np.ndarray, mass: float):
         name_length = random.randint(1, 10)
         planet_name = ''.join(random.choices(string.ascii_letters, k=name_length))
         planets_attributes = {'position': position, 'velocity': velocity, 'mass': mass}
@@ -71,8 +70,6 @@ class Loader:
         data[planet_name] = {}
         for attribute in planets_attributes.keys():
             data[planet_name][attribute] = planets_attributes[attribute]
-
-
 
     def load_data_from_json(self):
         with open(self.path) as file:

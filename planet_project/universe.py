@@ -115,7 +115,6 @@ class Planet:
     def calculate_acceleration(self) -> np.ndarray:
         """
         Calculates the planet's vector of acceleration using the formula a = F/m
-        :param force:
         :return:
         """
         a = self.force / self.mass
@@ -125,7 +124,6 @@ class Planet:
         """
         Calculates the planet's vector of velocity using the formula v = a * t. The velocity is constant during interval
         dt, dv is change of velocity during time dt
-        :param acceleration:
         :return:
         """
         dv = self.acceleration * self.dt
@@ -135,7 +133,6 @@ class Planet:
     def calculate_distance_traveled(self) -> np.ndarray:
         """
         Calculates the planet's vector of change in distance using the formula s = v * t.
-        :param velocity:
         :return:
         """
 
