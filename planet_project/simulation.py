@@ -17,11 +17,12 @@ class Loader:
     def __init__(self, **kwargs):
         self.path = kwargs.get('path')
         self.planets_number = kwargs.get('planets_number')
-        self.dt = kwargs.get('dt')
-        if self.dt is None:
-            raise ValueError('You must provide dt parameter.')
+
         if self.path is None and self.planets_number is None:
             raise ValueError('You must provide path parameter or planets_number parameter to load data.')
+        if self.path is not None and self.planets_number is not None:
+            raise ValueError(
+                'You must provide either path parameter or planets_number parameter to load data, not both.')
 
     def load_data(self) -> dict:
         """
@@ -80,10 +81,12 @@ class Simulation:
     Provide the path parameter (and load data from json file) or planets_num parameter (and generate random planets).
     """
 
-    def __init__(self, **kwargs):
-        dt = kwargs.get('dt')
+    def __init__(self, dt: int = 60*60*24, **kwargs):
+        self.dt = dt
+        if self.dt is None:
+            raise ValueError('You must provide dt (time step) parameter.')
         self.loader = Loader(**kwargs)
-        self.system = SolarSystem(dt)
+        self.system = SolarSystem(self.dt)
         self.animation = Animation(self.system)
 
     def run(self):
