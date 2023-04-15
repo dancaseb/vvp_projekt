@@ -46,7 +46,7 @@ class Loader:
 
         for planet in range(self.planets_number - 1):
             # generate the position of the planet
-            position = np.array([random.uniform(-10e11, 10e11), random.uniform(-10e11, 1e11)])
+            position = np.array([random.uniform(-10e10, 10e10), random.uniform(-10e10, 1e10)])
 
             # generate the velocity of the planet
             velocity = np.array([random.uniform(-30000, 30000), random.uniform(-30000, 30000)])

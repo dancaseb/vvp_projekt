@@ -131,8 +131,10 @@ class Animation:
         # Show the plot
 
         # If you don't have FFMpeg installed uncomment this line and comment the lines below
+        print('Saving animation...')
         writergif = animation.PillowWriter(fps=10)
         self.planets_animation.save("planets_simulation.gif", writergif)
+        print('Saving done.')
         plt.show()
 
         # save video using FFMpeg
