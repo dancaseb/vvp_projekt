@@ -93,11 +93,12 @@ class Animation:
         colors = [planet.color for planet in planet_plots]
         # set different markersizes according to planets mass (higher mass, bigger markersize in the plot
         masses = np.array([planet.mass for planet in planet_plots])
+        mass_mask = np.array([False if mass > 1e+30 else True for mass in masses])
         masses_scaled = np.zeros(len(planet_plots,))
-        # only take into consideration planets without the sun, which is at index 0
-        masses_scaled[1:] = np.interp(masses[1:], (min(masses[1:]), max(masses[1:])), (4, 15))
+        # only take into consideration smaller planets (without the sun)
+        masses_scaled[mass_mask] = np.interp(masses[mass_mask], (min(masses[mass_mask]), max(masses[mass_mask])), (4, 15))
         # set the markersize of the sun
-        masses_scaled[0] = 25
+        masses_scaled[~mass_mask] = 25
         # set data, color and markersize for each planet plot separately.
         for index, planet_plot in enumerate(self.planets_plot):
             planet_plot.set_data(x[index], y[index])
@@ -118,7 +119,7 @@ class Animation:
         """
 
         self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
-                                                         frames=1000, interval=20, repeat=True)
+                                                         frames=100, interval=20, repeat=True)
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
