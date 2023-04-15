@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
-import numpy as np
-# you must install ffmpeg to run this code
-plt.rcParams['animation.ffmpeg_path'] = 'C:\\Users\\Dano\\Downloads\\ffmpeg-master-latest-win64-gpl\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe'
-
 import matplotlib.animation as animation
-
+import numpy as np
 import planet_project.universe as universe
+# you must install ffmpeg to run this code and redirect to .exe file. Don't know how it works on Linux. This is only for
+# saving the image. If you don't have ffmpeg, check the comment in start animation function.
+plt.rcParams[
+    'animation.ffmpeg_path'] = 'C:\\Users\\Dano\\Downloads\\ffmpeg-master-latest-win64-gpl\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe'
 
 
 class Animation:
@@ -59,7 +59,7 @@ class Animation:
         background_stars = self.ax.plot(self.stars_x, self.stars_y, '.', markersize=1, color='white', alpha=0.5)
         self.background.append(background_stars)
 
-        # list of all plots. trajectories and planets
+        # list of all plots. background, trajectories and planets
         self.plots = self.background + self.trajectories_plots + self.planets_plot
 
         # return an iterable with plots to the animation function
@@ -91,16 +91,20 @@ class Animation:
         x = np.array([planet.position[0] for planet in planet_plots])
         y = np.array([planet.position[1] for planet in planet_plots])
         colors = [planet.color for planet in planet_plots]
+        # set different markersizes according to planets mass (higher mass, bigger markersize in the plot
         masses = np.array([planet.mass for planet in planet_plots])
-        masses_scaled = np.interp(masses, (min(masses), max(masses)), (4, 15))
-        masses[0] = 20
-        # set data for each planet plot separately.
+        masses_scaled = np.zeros(len(planet_plots,))
+        # only take into consideration planets without the sun, which is at index 0
+        masses_scaled[1:] = np.interp(masses[1:], (min(masses[1:]), max(masses[1:])), (4, 15))
+        # set the markersize of the sun
+        masses_scaled[0] = 25
+        # set data, color and markersize for each planet plot separately.
         for index, planet_plot in enumerate(self.planets_plot):
             planet_plot.set_data(x[index], y[index])
             planet_plot.set_color(colors[index])
             planet_plot.set_markersize(masses_scaled[index])
 
-        # list of all plots. trajectories and planets
+        # list of all plots. background, trajectories and planets
         self.plots = self.background + self.trajectories_plots + self.planets_plot
 
         # return an iterable with plots to the animation function
