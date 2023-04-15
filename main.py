@@ -388,15 +388,15 @@ from planet_project.simulation import Simulation
 # run the calculations
 # manager = Simulation(path='data/planets.json')
 # manager.run()
-# manager = Simulation(planets_number=2)
-# manager.run()
+manager = Simulation(planets_number=12, dt=60*60)
+manager.run()
 
 # manager = Simulation(path='data/planets.json', dt=60*60*24)
 # manager.run()
 # simulation = Simulation(path="data/planets.json", dt=60*60*24*7)
 # simulation.run()
-simulation = Simulation(path="data/planets.json", dt=60*60*24)
-simulation.run()
+# simulation = Simulation(path="data/three_body.json", dt=60*60*24*7)
+# simulation.run()
 # import numpy as np
 # from universe import Planet
 #
