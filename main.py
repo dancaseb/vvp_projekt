@@ -388,7 +388,7 @@ from planet_project.simulation import Simulation
 # run the calculations
 # manager = Simulation(path='data/planets.json')
 # manager.run()
-manager = Simulation(path='data/planets.json', dt=60*60*24*7)
+manager = Simulation(planets_number=12, dt=60*60*24*7)
 manager.run()
 
 # manager = Simulation(path='data/planets.json', dt=60*60*24)
