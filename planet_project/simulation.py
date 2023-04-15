@@ -5,7 +5,7 @@ import random
 import string
 
 import numpy as np
-from planet_project.constants import G
+from planet_project.constants import G, stay_in_system_force
 
 
 class Loader:
@@ -37,15 +37,16 @@ class Loader:
     def generate_random_data(self) -> dict:
         # dict with our planets
         data = {}
+        # parameters for the random sun. Will be bigger than planets
         sun_position = np.array([random.uniform(-10e8, 10e8), random.uniform(-10e8, 1e8)])
         sun_velocity = np.array([random.uniform(-10000, 10000), random.uniform(-10000, 10000)])
         sun_mass = random.uniform(1e30, 2e30)
-        # sun_mass = 1.989e+30
+        # generate the sun
         self.generate_planet(data, sun_position, sun_velocity, sun_mass)
 
         for planet in range(self.planets_number - 1):
             # generate the position of the planet
-            position = np.array([random.uniform(-10e10, 10e10), random.uniform(-10e10, 1e10)])
+            position = np.array([random.uniform(-10e11, 10e11), random.uniform(-10e11, 1e11)])
 
             # generate the velocity of the planet
             velocity = np.array([random.uniform(-30000, 30000), random.uniform(-30000, 30000)])
@@ -53,7 +54,7 @@ class Loader:
             # kinda random guess of the mass. I wanted the generated solarsystem to be compact
             # and not all the planets escaping out of the gravitational field of the sun
             r = np.linalg.norm(sun_position - position)
-            mass = (3e20 * np.linalg.norm(r)**2)/(sun_mass * G)
+            mass = (stay_in_system_force * np.linalg.norm(r)**2)/(sun_mass * G)
             # generate the planet, we update the data
             self.generate_planet(data, position, velocity, mass)
         return data

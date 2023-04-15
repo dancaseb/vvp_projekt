@@ -37,7 +37,6 @@ class Planet:
         if not isinstance(new_position, np.ndarray):
             raise AssertionError('Position must be ndarray type.')
         if new_position.shape != (2,):
-            # print(new_position.shape)
             raise AssertionError('Position must contain 2 elements for x and y axis.')
         self._position = new_position
 
@@ -50,7 +49,6 @@ class Planet:
         if not isinstance(new_acceleration, np.ndarray):
             raise AssertionError('Acceleration must be ndarray type.')
         if new_acceleration.shape != (2,):
-            # print(new_acceleration.shape)
             raise AssertionError('Acceleration must contain 2 elements for x and y axis.')
         self._acceleration = new_acceleration
 
@@ -63,7 +61,6 @@ class Planet:
         if not isinstance(new_force, np.ndarray):
             raise AssertionError('Force must be ndarray type.')
         if new_force.shape != (2,):
-            # print(new_force.shape)
             raise AssertionError('Force must contain 2 elements for x and y axis.')
         self._force = new_force
 
@@ -84,7 +81,6 @@ class Planet:
         if not isinstance(new_velocity, np.ndarray):
             raise AssertionError('Velocity must be ndarray type.')
         if new_velocity.shape != (2,):
-            # print(new_velocity.shape)
             raise AssertionError('Velocity must contain 2 elements for x and y axis.')
         self._velocity = new_velocity
 
@@ -102,10 +98,7 @@ class Planet:
         ds = self.calculate_distance_traveled()
         # add the change to previous position
         self.position += ds
-        # print(self.name, self.position)
-        # print(self.velocity)
-        # if self.name == 'Mercury':
-        #     print(self.position)
+
         # append the new position, used for plotting trajectory
         self.positions.append(tuple(self.position))
         # keep the plotting image up to date
@@ -122,7 +115,7 @@ class Planet:
 
     def calculate_velocity(self) -> np.ndarray:
         """
-        Calculates the planet's vector of velocity using the formula v = a * t. The velocity is constant during interval
+        Calculates the planet's vector of velocity using the formula dv = a * dt. The velocity is constant during interval
         dt, dv is change of velocity during time dt
         :return:
         """
@@ -140,6 +133,10 @@ class Planet:
         return ds
 
     def update_plot(self):
+        """
+        Update the plotting objects attributes.
+        :return:
+        """
         self.planet_plot.position = self.position
         self.planet_plot.positions = self.positions
 
@@ -222,7 +219,6 @@ class SolarSystem:
                     continue
                 else:
                     F = self.calculate_force(planet1, planet2)
-
                     planet1.forces.append(F)
 
         for planet in self.planets:

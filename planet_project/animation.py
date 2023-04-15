@@ -2,10 +2,13 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import planet_project.universe as universe
+from planet_project.constants import star_mass, planet_scale, star_size
+
+
 # you must install ffmpeg to run this code and redirect to .exe file. Don't know how it works on Linux. This is only for
-# saving the image. If you don't have ffmpeg, check the comment in start animation function.
-plt.rcParams[
-    'animation.ffmpeg_path'] = 'C:\\Users\\Dano\\Downloads\\ffmpeg-master-latest-win64-gpl\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe'
+# saving the image. If you don't have ffmpeg, the video will be saved as a .gif file
+# plt.rcParams[
+#     'animation.ffmpeg_path'] = 'C:\\Users\\Dano\\Downloads\\ffmpeg-master-latest-win64-gpl\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe'
 
 
 class Animation:
@@ -56,7 +59,7 @@ class Animation:
             # Having a different plot for the actual planet, we can easily remove it when resetting the animation.
             plot_planet, = self.ax.plot([], [], 'o', color='blue')
             self.planets_plot.append(plot_planet)
-        background_stars = self.ax.plot(self.stars_x, self.stars_y, '.', markersize=1, color='white', alpha=0.5)
+        background_stars = self.ax.plot(self.stars_x, self.stars_y, '.', markersize=1, color='white', alpha=1)
         self.background.append(background_stars)
 
         # list of all plots. background, trajectories and planets
@@ -93,13 +96,14 @@ class Animation:
         colors = [planet.color for planet in planet_plots]
         # set different markersizes according to planets mass (higher mass, bigger markersize in the plot
         masses = np.array([planet.mass for planet in planet_plots])
-        mass_mask = np.array([False if mass > 1e+30 else True for mass in masses])
+        mass_mask = np.array([False if mass > star_mass else True for mass in masses])
         masses_scaled = np.zeros(len(planet_plots,))
         # only take into consideration smaller planets (without the sun)
-        masses_scaled[mass_mask] = np.interp(masses[mass_mask], (min(masses[mass_mask]), max(masses[mass_mask])), (4, 15))
-        # set the markersize of the sun
-        masses_scaled[~mass_mask] = 25
-        # set data, color and markersize for each planet plot separately.
+        masses_scaled[mass_mask] = np.interp(masses[mass_mask], (min(masses[mass_mask]), max(masses[mass_mask])),
+                                             planet_scale)
+        # set the marker size of the sun
+        masses_scaled[~mass_mask] = star_size
+        # set data, color and marker size for each planet plot separately.
         for index, planet_plot in enumerate(self.planets_plot):
             planet_plot.set_data(x[index], y[index])
             planet_plot.set_color(colors[index])
@@ -119,20 +123,23 @@ class Animation:
         """
 
         self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
-                                                         frames=100, interval=20, repeat=True)
+                                                         interval=20, repeat=True, save_count=250)
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
         # plt.imshow(self.background, extent=[-5e12, 5e12, -5e12, 5e12])
         # Show the plot
-        plt.show()
-        # save video using FFMpeg
-        writer = animation.FFMpegWriter(fps=10)
-        # Save the animation as a video file
-        self.planets_animation.save("planets_simulation.mp4", writer=writer)
 
-        # If you don't have FFMpeg installed uncomment this line and comment the lines above
-        # self.planets_animation.save("planets_simulation.gif", fps=10)
+        # If you don't have FFMpeg installed uncomment this line and comment the lines below
+        writergif = animation.PillowWriter(fps=10)
+        self.planets_animation.save("planets_simulation.gif", writergif)
+        plt.show()
+
+        # save video using FFMpeg
+        # writer = animation.FFMpegWriter(fps=10)
+        # # Save the animation as a video file
+        # self.planets_animation.save("planets_simulation.mp4", writer=writer)
+
 
     def _toggle_pause(self, *args, **kwargs):
         # internal function, pauses and resumes animation when clicked on figure
