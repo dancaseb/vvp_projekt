@@ -31,8 +31,8 @@ class Loader:
         """
         if self.path is None:
             return self.generate_random_data()
-        else:
-            return self.load_data_from_json()
+
+        return self.load_data_from_json()
 
     def generate_random_data(self) -> dict:
         # dict with our planets
@@ -44,7 +44,7 @@ class Loader:
         # generate the sun
         self.generate_planet(data, sun_position, sun_velocity, sun_mass)
 
-        for planet in range(self.planets_number - 1):
+        for _ in range(self.planets_number - 1):
             # generate the position of the planet
             position = np.array([random.uniform(-10e10, 10e10), random.uniform(-10e10, 1e10)])
 
