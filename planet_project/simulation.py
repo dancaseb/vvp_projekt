@@ -82,13 +82,15 @@ class Simulation:
     Provide the path parameter (and load data from json file) or planets_num parameter (and generate random planets).
     """
 
-    def __init__(self, dt: int = 60*60*24, **kwargs):
+    def __init__(self, dt: int = 60 * 60 * 24, gif_path: str = 'planets_simulation.gif', background_on: bool = True,
+                 gif_fps: int = 10, gif_length: int = 30, gif_zoom: float = 1, **kwargs):
         self.dt = dt
         if self.dt is None:
             raise ValueError('You must provide dt (time step) parameter.')
         self.loader = Loader(**kwargs)
         self.system = SolarSystem(self.dt)
-        self.animation = Animation(self.system)
+        self.animation = Animation(self.system, gif_path=gif_path, background_on=background_on, gif_fps=gif_fps,
+                                   gif_length=gif_length, gif_zoom=gif_zoom)
 
     def run(self):
         """

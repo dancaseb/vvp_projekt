@@ -16,18 +16,29 @@ class Animation:
     Animation class used for animating the object movement. Takes SolarSystem object as parameter. The __init__ function
     creates the base figure with xlim and ylim. The animation will be a sequence of these figures.
     """
-    def __init__(self, solar_system: universe.SolarSystem):
+
+    def __init__(self, solar_system: universe.SolarSystem, background_on: bool = True,
+                 gif_path: str = 'planets_simulation.gif', gif_fps: int = 10, gif_length: int = 30,
+                 gif_zoom: float = 0.5):
         self.system = solar_system
+        self.gif_path = gif_path
+        self.gif_fps = gif_fps
+        self.gif_length = gif_length
+        self.gif_zoom = gif_zoom
+        self.background_on = background_on
         self.trajectories_plots = []
         self.planets_plot = []
         self.plots = []
         self.background = []
-        self.stars_x = np.random.uniform(low=-5e12, high=5e12, size=500)
-        self.stars_y = np.random.uniform(low=-5e12, high=5e12, size=500)
         # Create the figure object and axes
         self.fig, self.ax = plt.subplots(figsize=(8, 6))
-        self.ax.set_xlim(-5e12, 5e12)
-        self.ax.set_ylim(-5e12, 5e12)
+        self.xlim_min, self.xlim_max = -5e12, 5e12
+        self.ylim_min, self.ylim_max = -5e12, 5e12
+        if self.background_on:
+            self.stars_x = np.random.uniform(low=self.xlim_min, high=self.xlim_max, size=500)
+            self.stars_y = np.random.uniform(low=self.ylim_min, high=self.ylim_max, size=500)
+        self.ax.set_xlim(self.xlim_min, self.xlim_max)
+        self.ax.set_ylim(self.ylim_min, self.ylim_max)
         self.ax.set_facecolor('black')
         self.paused = False
         self.planets_animation = None
@@ -51,19 +62,21 @@ class Animation:
         # for each planet we create own plot and store it in trajectories_plots
         # trajectory plots, ls='-' specifies the line style
         for _ in range(planets_num):
-            one_planet_trajectory, = self.ax.plot([], [], 'gray', ls='-')
+            one_planet_trajectory, = self.ax.plot([], [], 'gray', ls='-', zorder=2)
             self.trajectories_plots.append(one_planet_trajectory)
 
             # Single point plot representing the actual planet. I didn't parametrize the one_planet_trajectory to plot
             # a point in the end of trajectory, because when the animation was reset, the point stayed in the plot.
             # Having a different plot for the actual planet, we can easily remove it when resetting the animation.
-            plot_planet, = self.ax.plot([], [], 'o', color='blue')
+            plot_planet, = self.ax.plot([], [], 'o', color='blue', alpha=1, zorder=3)
             self.planets_plot.append(plot_planet)
-        background_stars = self.ax.plot(self.stars_x, self.stars_y, '.', markersize=1, color='white', alpha=1)
-        self.background.append(background_stars)
+        if self.background_on:
+            background_stars = self.ax.plot(self.stars_x, self.stars_y, '.', markersize=1, color='white', alpha=0.5,
+                                            zorder=1)
+            self.background.append(background_stars)
 
         # list of all plots. background, trajectories and planets
-        self.plots = self.background + self.trajectories_plots + self.planets_plot
+        self.plots = self.trajectories_plots + self.planets_plot + self.background
 
         # return an iterable with plots to the animation function
         return self.plots
@@ -96,7 +109,8 @@ class Animation:
         colors = [planet.color for planet in planet_plots]
         # set different markersizes according to planets mass (higher mass, bigger markersize in the plot
         masses = np.array([planet.mass for planet in planet_plots])
-        mass_mask = np.array([False if mass > star_mass else True for mass in masses])
+        # mass_mask = np.array([False if mass > star_mass else True for mass in masses])
+        mass_mask = masses <= star_mass
         masses_scaled = np.zeros(len(planet_plots,))
         # only take into consideration smaller planets (without the sun)
         masses_scaled[mass_mask] = np.interp(masses[mass_mask], (min(masses[mass_mask]), max(masses[mass_mask])),
@@ -110,7 +124,7 @@ class Animation:
             planet_plot.set_markersize(masses_scaled[index])
 
         # list of all plots. background, trajectories and planets
-        self.plots = self.background + self.trajectories_plots + self.planets_plot
+        self.plots = self.trajectories_plots + self.planets_plot + self.background
 
         # return an iterable with plots to the animation function
         return self.plots
@@ -123,7 +137,8 @@ class Animation:
         """
 
         self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
-                                                         interval=20, repeat=True, save_count=250)
+                                                         interval=20, repeat=True,
+                                                         save_count=self.gif_length * self.gif_fps)
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
@@ -140,12 +155,15 @@ class Animation:
         # self.planets_animation.save("planets_simulation.mp4", writer=writer)
 
     def save_animation(self):
-        self.fig.subplots_adjust(left=0, right=1, bottom=0, top=1, wspace=None, hspace=None)
+        plt.xlim(self.xlim_min * self.gif_zoom, self.xlim_max * self.gif_zoom)
+        plt.ylim(self.ylim_min * self.gif_zoom, self.ylim_max * self.gif_zoom)
         # If you don't have FFMpeg installed uncomment this line and comment the lines below
         print('Saving animation...')
-        writergif = animation.PillowWriter(fps=10)
-        self.planets_animation.save("planets_simulation.gif", writergif)
+        writergif = animation.PillowWriter(fps=self.gif_fps)
+        self.planets_animation.save(self.gif_path, writergif)
         print('Saving done.')
+        plt.xlim(self.xlim_min, self.xlim_max)
+        plt.ylim(self.ylim_min, self.ylim_max)
 
 
     def _toggle_pause(self, *args, **kwargs):
