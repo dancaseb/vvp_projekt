@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import planet_project.universe as universe
-from planet_project.constants import star_mass, planet_scale, star_size
+from planet_project.constants import star_mass, planet_scale, star_size, edges
 
 
 # you must install ffmpeg to run this code and redirect to .exe file. Don't know how it works on Linux. This is only for
@@ -32,8 +32,8 @@ class Animation:
         self.background = []
         # Create the figure object and axes
         self.fig, self.ax = plt.subplots(figsize=(8, 6))
-        self.xlim_min, self.xlim_max = -5e12, 5e12
-        self.ylim_min, self.ylim_max = -5e12, 5e12
+        self.xlim_min, self.xlim_max = self._find_limits(0)
+        self.ylim_min, self.ylim_max = self._find_limits(1)
         if self.background_on:
             self.stars_x = np.random.uniform(low=self.xlim_min, high=self.xlim_max, size=500)
             self.stars_y = np.random.uniform(low=self.ylim_min, high=self.ylim_max, size=500)
@@ -173,3 +173,12 @@ class Animation:
         else:
             self.planets_animation.pause()
         self.paused = not self.paused
+
+    def _find_limits(self, axis: int):
+        # find lim_max and lim_min for given axis (0 is axis x and 1 is axis y)
+        if axis != 0 and axis != 1:
+            raise ValueError('axis must be set to zero or one in _find_limits function.')
+        positions = [planet.position[axis] for planet in self.system.planets]
+        return min(positions) - edges, max(positions) + edges
+
+

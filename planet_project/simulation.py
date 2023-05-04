@@ -80,6 +80,7 @@ class Simulation:
     """
     Manager class responsible for calling the loading, calculation and animation.
     Provide the path parameter (and load data from json file) or planets_num parameter (and generate random planets).
+    Load the planets and add them to the solar system
     """
 
     def __init__(self, dt: int = 60 * 60 * 24, gif_path: str = 'planets_simulation.gif', background_on: bool = True,
@@ -89,14 +90,14 @@ class Simulation:
             raise ValueError('You must provide dt (time step) parameter.')
         self.loader = Loader(**kwargs)
         self.system = SolarSystem(self.dt)
+        planets = self.loader.load_data()
+        self.system.add_planets(planets)
         self.animation = Animation(self.system, gif_path=gif_path, background_on=background_on, gif_fps=gif_fps,
                                    gif_length=gif_length, gif_zoom=gif_zoom)
 
     def run(self):
         """
-        Executing function. Loads data, adds planets and then start animation.
+        Executing function. Starts the simulation and animation.
         :return:
         """
-        planets = self.loader.load_data()
-        self.system.add_planets(planets)
         self.animation.start_animation()

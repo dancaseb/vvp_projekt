@@ -4,3 +4,4 @@ star_mass = 1e+30
 star_size = 25
 planet_scale = (4, 15)
 stay_in_system_force = 3e22
+edges = 1e12
