@@ -42,6 +42,7 @@ class Animation:
         self.ax.set_facecolor('black')
         self.paused = False
         self.planets_animation = None
+        self.planets_num = 0
 
     def init_animation(self) -> list[plt.Axes.plot]:
         """
@@ -58,25 +59,20 @@ class Animation:
         self.plots.clear()
         self.background.clear()
 
-        planets_num = len(self.system.planets)
+        self.planets_num = len(self.system.planets)
         # for each planet we create own plot and store it in trajectories_plots
         # trajectory plots, ls='-' specifies the line style
-        for _ in range(planets_num):
+        for _ in range(self.planets_num):
             one_planet_trajectory, = self.ax.plot([], [], 'gray', ls='-', zorder=2)
             self.trajectories_plots.append(one_planet_trajectory)
 
-            # Single point plot representing the actual planet. I didn't parametrize the one_planet_trajectory to plot
-            # a point in the end of trajectory, because when the animation was reset, the point stayed in the plot.
-            # Having a different plot for the actual planet, we can easily remove it when resetting the animation.
-            plot_planet, = self.ax.plot([], [], 'o', color='blue', alpha=1, zorder=3)
-            self.planets_plot.append(plot_planet)
         if self.background_on:
             background_stars = self.ax.plot(self.stars_x, self.stars_y, '.', markersize=1, color='white', alpha=0.5,
                                             zorder=1)
             self.background.append(background_stars)
 
         # list of all plots. background, trajectories and planets
-        self.plots = self.trajectories_plots + self.planets_plot + self.background
+        self.plots = self.trajectories_plots + self.background
 
         # return an iterable with plots to the animation function
         return self.plots
@@ -98,10 +94,6 @@ class Animation:
         xlist = [[position[0] for position in planet_plot.positions] for planet_plot in planet_plots]
         ylist = [[position[1] for position in planet_plot.positions] for planet_plot in planet_plots]
 
-        # set data for each trajectory plot separately.
-        for index, trajectory_plot in enumerate(self.trajectories_plots):
-            trajectory_plot.set_data(xlist[index], ylist[index])
-
         # x,y coordinates for the planets actual position.
         # At this position a circle representing the planet will be plotted
         x = np.array([planet.position[0] for planet in planet_plots])
@@ -118,13 +110,17 @@ class Animation:
         # set the marker size of the sun
         masses_scaled[~mass_mask] = star_size
         # set data, color and marker size for each planet plot separately.
-        for index, planet_plot in enumerate(self.planets_plot):
-            planet_plot.set_data(x[index], y[index])
-            planet_plot.set_color(colors[index])
-            planet_plot.set_markersize(masses_scaled[index])
 
-        # list of all plots. background, trajectories and planets
-        self.plots = self.trajectories_plots + self.planets_plot + self.background
+        # delete previous circles in ax. Plotting will be faster
+        self._delete_planet_circles()
+        # set data for each trajectory plot separately. Each trajectory has a planet, add planet as patch (circle)
+        for index, trajectory_plot in enumerate(self.trajectories_plots):
+            trajectory_plot.set_data(xlist[index], ylist[index])
+            circle = plt.Circle((x[index], y[index]), radius=masses_scaled[index], color=colors[index], fill=True, zorder=3)
+            self.ax.add_patch(circle)
+
+        # list of all plots. background, trajectories
+        self.plots = self.trajectories_plots + self.background
 
         # return an iterable with plots to the animation function
         return self.plots
@@ -181,4 +177,6 @@ class Animation:
         positions = [planet.position[axis] for planet in self.system.planets]
         return min(positions) - edges, max(positions) + edges
 
-
+    def _delete_planet_circles(self):
+        # delete all patches from self.ax. We only add circles (representing the planet plot) as patches
+        [p.remove() for p in self.ax.patches]
