@@ -25,7 +25,7 @@ class Planet:
         self._velocity = velocity
         self.forces = []
         self.dt = dt
-        self.positions = [self._position]
+        self.positions = [tuple(self._position)]
         self.planet_plot = self.PlanetPlot(self)
 
     @property
@@ -100,7 +100,7 @@ class Planet:
         self.position += ds
 
         # append the new position, used for plotting trajectory
-        self.positions.append(self.position)
+        self.positions.append(tuple(self.position))
         # keep the plotting image up to date
         self.update_plot()
         self.forces.clear()
