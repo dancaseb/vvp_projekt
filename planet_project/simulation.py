@@ -101,3 +101,5 @@ class Simulation:
         :return:
         """
         self.animation.start_animation()
+    def save_animation(self):
+        pass

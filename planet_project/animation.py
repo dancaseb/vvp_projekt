@@ -138,9 +138,6 @@ class Animation:
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
-        # plt.imshow(self.background, extent=[-5e12, 5e12, -5e12, 5e12])
-
-        self.save_animation()
 
         # Show the plot
         plt.show()
