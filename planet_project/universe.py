@@ -214,12 +214,10 @@ class SolarSystem:
         """
 
         for index1, planet1 in enumerate(self.planets):
-            for index2, planet2 in enumerate(self.planets):
-                if index2 == index1:
-                    continue
-                else:
-                    F = self.calculate_force(planet1, planet2)
-                    planet1.forces.append(F)
+            for index2, planet2 in enumerate(self.planets[index1+1:]):
+                F = self.calculate_force(planet1, planet2)
+                planet1.forces.append(F)
+                planet2.forces.append(-F)
 
         for planet in self.planets:
             planet.calculate_position()
