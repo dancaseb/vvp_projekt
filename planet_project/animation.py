@@ -94,7 +94,7 @@ class Animation:
         xlist = [[position[0] for position in planet_plot.positions] for planet_plot in planet_plots]
         ylist = [[position[1] for position in planet_plot.positions] for planet_plot in planet_plots]
 
-        self.prepare_plots(xlist, ylist, planet_plots)
+        self._prepare_plots(xlist, ylist, planet_plots)
 
         # list of all plots. background, trajectories
         self.plots = self.trajectories_plots + self.background
@@ -157,15 +157,21 @@ class Animation:
         # delete all patches from self.ax. We only add circles (representing the planet plot) as patches
         [p.remove() for p in self.ax.patches]
 
-    def prepare_plots(self, xlist, ylist, planet_plots):
+    def _prepare_plots(self, xlist, ylist, planet_plots):
+        """
+        Add the necessary info into our plots. Working with positions (xlist, ylist) and a list with all planet plotting
+        objects.
+        :param xlist:
+        :param ylist:
+        :param planet_plots:
+        :return:
+        """
         # x,y coordinates for the planets actual position.
         # At this position a circle representing the planet will be plotted
         x = np.array([planet.position[0] for planet in planet_plots])
         y = np.array([planet.position[1] for planet in planet_plots])
         colors = [planet.color for planet in planet_plots]
-        # set different markersizes according to planets mass (higher mass, bigger markersize in the plot
         masses = np.array([planet.mass for planet in planet_plots])
-        # mass_mask = np.array([False if mass > star_mass else True for mass in masses])
         mass_mask = masses <= star_mass
         masses_scaled = np.zeros(len(planet_plots, ))
         # only take into consideration smaller planets (without the sun)
