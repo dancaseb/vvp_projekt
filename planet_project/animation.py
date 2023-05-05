@@ -125,6 +125,7 @@ class Animation:
         # self.planets_animation.save("planets_simulation.mp4", writer=writer)
 
     def save_animation(self):
+        # ziskat xlist a ylist a pak pomoci slicu davat jako parametr _prepare_plots. Podivat se, jak poresit x a y (mozna udelat jako posledni prvek z xlist a ylist?)
         pass
         # plt.xlim(self.xlim_min * self.gif_zoom, self.xlim_max * self.gif_zoom)
         # plt.ylim(self.ylim_min * self.gif_zoom, self.ylim_max * self.gif_zoom)
