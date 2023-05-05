@@ -94,30 +94,7 @@ class Animation:
         xlist = [[position[0] for position in planet_plot.positions] for planet_plot in planet_plots]
         ylist = [[position[1] for position in planet_plot.positions] for planet_plot in planet_plots]
 
-        # x,y coordinates for the planets actual position.
-        # At this position a circle representing the planet will be plotted
-        x = np.array([planet.position[0] for planet in planet_plots])
-        y = np.array([planet.position[1] for planet in planet_plots])
-        colors = [planet.color for planet in planet_plots]
-        # set different markersizes according to planets mass (higher mass, bigger markersize in the plot
-        masses = np.array([planet.mass for planet in planet_plots])
-        # mass_mask = np.array([False if mass > star_mass else True for mass in masses])
-        mass_mask = masses <= star_mass
-        masses_scaled = np.zeros(len(planet_plots,))
-        # only take into consideration smaller planets (without the sun)
-        masses_scaled[mass_mask] = np.interp(masses[mass_mask], (min(masses[mass_mask]), max(masses[mass_mask])),
-                                             planet_scale)
-        # set the marker size of the sun
-        masses_scaled[~mass_mask] = star_size
-        # set data, color and marker size for each planet plot separately.
-
-        # delete previous circles in ax. Plotting will be faster
-        self._delete_planet_circles()
-        # set data for each trajectory plot separately. Each trajectory has a planet, add planet as patch (circle)
-        for index, trajectory_plot in enumerate(self.trajectories_plots):
-            trajectory_plot.set_data(xlist[index], ylist[index])
-            circle = plt.Circle((x[index], y[index]), radius=masses_scaled[index], color=colors[index], fill=True, zorder=3)
-            self.ax.add_patch(circle)
+        self.prepare_plots(xlist, ylist, planet_plots)
 
         # list of all plots. background, trajectories
         self.plots = self.trajectories_plots + self.background
@@ -148,15 +125,17 @@ class Animation:
         # self.planets_animation.save("planets_simulation.mp4", writer=writer)
 
     def save_animation(self):
-        plt.xlim(self.xlim_min * self.gif_zoom, self.xlim_max * self.gif_zoom)
-        plt.ylim(self.ylim_min * self.gif_zoom, self.ylim_max * self.gif_zoom)
-        # If you don't have FFMpeg installed uncomment this line and comment the lines below
-        print('Saving animation...')
-        writergif = animation.PillowWriter(fps=self.gif_fps)
-        self.planets_animation.save(self.gif_path, writergif)
-        print('Saving done.')
-        plt.xlim(self.xlim_min, self.xlim_max)
-        plt.ylim(self.ylim_min, self.ylim_max)
+        pass
+        # plt.xlim(self.xlim_min * self.gif_zoom, self.xlim_max * self.gif_zoom)
+        # plt.ylim(self.ylim_min * self.gif_zoom, self.ylim_max * self.gif_zoom)
+        # print('Saving animation...')
+        # writergif = animation.PillowWriter(fps=self.gif_fps)
+        # self.planets_animation.save(self.gif_path, writergif)
+        # print('Saving done.')
+        # plt.xlim(self.xlim_min, self.xlim_max)
+        # plt.ylim(self.ylim_min, self.ylim_max)
+
+
 
 
     def _toggle_pause(self, *args, **kwargs):
@@ -177,3 +156,30 @@ class Animation:
     def _delete_planet_circles(self):
         # delete all patches from self.ax. We only add circles (representing the planet plot) as patches
         [p.remove() for p in self.ax.patches]
+
+    def prepare_plots(self, xlist, ylist, planet_plots):
+        # x,y coordinates for the planets actual position.
+        # At this position a circle representing the planet will be plotted
+        x = np.array([planet.position[0] for planet in planet_plots])
+        y = np.array([planet.position[1] for planet in planet_plots])
+        colors = [planet.color for planet in planet_plots]
+        # set different markersizes according to planets mass (higher mass, bigger markersize in the plot
+        masses = np.array([planet.mass for planet in planet_plots])
+        # mass_mask = np.array([False if mass > star_mass else True for mass in masses])
+        mass_mask = masses <= star_mass
+        masses_scaled = np.zeros(len(planet_plots, ))
+        # only take into consideration smaller planets (without the sun)
+        masses_scaled[mass_mask] = np.interp(masses[mass_mask], (min(masses[mass_mask]), max(masses[mass_mask])),
+                                             planet_scale)
+        # set the marker size of the sun
+        masses_scaled[~mass_mask] = star_size
+        # set data, color and marker size for each planet plot separately.
+
+        # delete previous circles in ax. Plotting will be faster
+        self._delete_planet_circles()
+        # set data for each trajectory plot separately. Each trajectory has a planet, add planet as patch (circle)
+        for index, trajectory_plot in enumerate(self.trajectories_plots):
+            trajectory_plot.set_data(xlist[index], ylist[index])
+            circle = plt.Circle((x[index], y[index]), radius=masses_scaled[index], color=colors[index], fill=True,
+                                zorder=3)
+            self.ax.add_patch(circle)
