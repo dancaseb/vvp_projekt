@@ -223,3 +223,6 @@ class SolarSystem:
         planet_plots = [p.planet_plot for p in self.planets]
 
         return planet_plots
+
+    def get_planet_plots(self):
+        return [p.planet_plot for p in self.planets]

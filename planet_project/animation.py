@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import planet_project.universe as universe
-from planet_project.constants import star_mass, planet_scale, star_size, edges
+from planet_project.constants import star_mass, planet_scale, star_size, edges, star_count
 
 
 # you must install ffmpeg to run this code and redirect to .exe file. Don't know how it works on Linux. This is only for
@@ -17,31 +17,22 @@ class Animation:
     creates the base figure with xlim and ylim. The animation will be a sequence of these figures.
     """
 
-    def __init__(self, solar_system: universe.SolarSystem, background_on: bool = True,
-                 gif_path: str = 'planets_simulation.gif', gif_fps: int = 10, gif_length: int = 30,
-                 gif_zoom: float = 0.5):
+    def __init__(self, solar_system: universe.SolarSystem, background_on: bool = True):
+        self.paused = None
+        self.stars_y = None
+        self.stars_x = None
+        self.ax = None
+        self.fig = None
+        self.planets_animation = None
+        self.planets_num = 0
         self.system = solar_system
-        self.gif_path = gif_path
-        self.gif_fps = gif_fps
-        self.gif_length = gif_length
-        self.gif_zoom = gif_zoom
         self.background_on = background_on
         self.trajectories_plots = []
         self.planets_plot = []
         self.plots = []
         self.background = []
         # Create the figure object and axes
-        self.fig, self.ax = plt.subplots(figsize=(8, 6))
-        self.xlim_min, self.xlim_max, self.ylim_min, self.ylim_max = self._find_limits()
-        if self.background_on:
-            self.stars_x = np.random.uniform(low=self.xlim_min, high=self.xlim_max, size=500)
-            self.stars_y = np.random.uniform(low=self.ylim_min, high=self.ylim_max, size=500)
-        self.ax.set_xlim(self.xlim_min, self.xlim_max)
-        self.ax.set_ylim(self.ylim_min, self.ylim_max)
-        self.ax.set_facecolor('black')
-        self.paused = False
-        self.planets_animation = None
-        self.planets_num = 0
+        self._reset_fig()
 
     def init_animation(self) -> list[plt.Axes.plot]:
         """
@@ -101,6 +92,18 @@ class Animation:
         # return an iterable with plots to the animation function
         return self.plots
 
+    def _slice_and_plot(self, frame, start_frame, xlist, ylist, planet_plots):
+        xlist = xlist[:, :start_frame + frame + 1]
+        ylist = ylist[:, :start_frame + frame + 1]
+
+        self._prepare_plots(xlist, ylist, planet_plots)
+
+        # list of all plots. background, trajectories
+        self.plots = self.trajectories_plots + self.background
+
+        # return an iterable with plots to the animation function
+        return self.plots
+
     def start_animation(self):
         """
         Function to start the animation. This is done by the FuncAnimation from matplotlib.Animation module.
@@ -109,8 +112,7 @@ class Animation:
         """
 
         self.planets_animation = animation.FuncAnimation(self.fig, self.update, init_func=self.init_animation,
-                                                         interval=20, repeat=True,
-                                                         save_count=self.gif_length * self.gif_fps)
+                                                         interval=20, repeat=True, frames=200)
 
         # when clicking on figure the animation stops
         self.fig.canvas.mpl_connect('button_press_event', self._toggle_pause)
@@ -123,20 +125,37 @@ class Animation:
         # # Save the animation as a video file
         # self.planets_animation.save("planets_simulation.mp4", writer=writer)
 
-    def save_animation(self):
-        # ziskat xlist a ylist a pak pomoci slicu davat jako parametr _prepare_plots. Podivat se, jak poresit x a y (mozna udelat jako posledni prvek z xlist a ylist?)
-        pass
+    def save_animation(self, gif_path: str = 'planets_simulation.gif', gif_fps: int = 10, gif_start=0,
+                       gif_length: int = 30, gif_zoom: float = 0.5):
+        """
+        Save the animation. Works with data calculated from the simulation run by start_animation function.
+        :param gif_path:
+        :param gif_fps:
+        :param gif_start:
+        :param gif_length:
+        :param gif_zoom:
+        :return:
+        """
         # plt.xlim(self.xlim_min * self.gif_zoom, self.xlim_max * self.gif_zoom)
         # plt.ylim(self.ylim_min * self.gif_zoom, self.ylim_max * self.gif_zoom)
-        # print('Saving animation...')
-        # writergif = animation.PillowWriter(fps=self.gif_fps)
-        # self.planets_animation.save(self.gif_path, writergif)
-        # print('Saving done.')
-        # plt.xlim(self.xlim_min, self.xlim_max)
-        # plt.ylim(self.ylim_min, self.ylim_max)
+        start_frame = gif_start * gif_fps
+        total_frames = gif_length * gif_fps
+        # reset the fig to default settings
+        self._reset_fig()
+        planet_plots = self.system.get_planet_plots()
+        xlist = np.array([[position[0] for position in planet_plot.positions] for planet_plot in planet_plots])
+        ylist = np.array([[position[1] for position in planet_plot.positions] for planet_plot in planet_plots])
+        if total_frames + start_frame > xlist.shape[1]:
+            print(
+                f"Not enough data to save the animation. Shorter version of the animation will be saved. Adjust gif_fps, gif_length, gif_start or let the simulation run longer.")
+        saved_anim = animation.FuncAnimation(self.fig, self._slice_and_plot, init_func=self.init_animation,
+                                             interval=20, repeat=False, frames=gif_length * gif_fps,
+                                             fargs=(start_frame, xlist, ylist, planet_plots))
 
-
-
+        print('Saving animation...')
+        writergif = animation.PillowWriter(fps=gif_fps)
+        saved_anim.save(gif_path, writergif)
+        print('Saving done.')
 
     def _toggle_pause(self, *args, **kwargs):
         # internal function, pauses and resumes animation when clicked on figure
@@ -190,3 +209,18 @@ class Animation:
             circle = plt.Circle((x[index], y[index]), radius=masses_scaled[index], color=colors[index], fill=True,
                                 zorder=3)
             self.ax.add_patch(circle)
+
+    def _reset_fig(self):
+        """
+        resets the figure and adds default settings for the animation
+        :return:
+        """
+        self.fig, self.ax = plt.subplots(figsize=(8, 6))
+        xlim_min, xlim_max, ylim_min, ylim_max = self._find_limits()
+        if self.background_on:
+            self.stars_x = np.random.uniform(low=xlim_min, high=xlim_max, size=star_count)
+            self.stars_y = np.random.uniform(low=ylim_min, high=ylim_max, size=star_count)
+        self.ax.set_xlim(xlim_min, xlim_max)
+        self.ax.set_ylim(ylim_min, ylim_max)
+        self.ax.set_facecolor('black')
+        self.paused = False

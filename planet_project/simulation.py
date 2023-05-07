@@ -92,8 +92,7 @@ class Simulation:
         self.system = SolarSystem(self.dt)
         planets = self.loader.load_data()
         self.system.add_planets(planets)
-        self.animation = Animation(self.system, gif_path=gif_path, background_on=background_on, gif_fps=gif_fps,
-                                   gif_length=gif_length, gif_zoom=gif_zoom)
+        self.animation = Animation(self.system, background_on=background_on)
 
     def run(self):
         """
@@ -102,5 +101,16 @@ class Simulation:
         """
         self.animation.start_animation()
 
-    def save_animation(self):
-        self.animation.save_animation()
+    def save(self, gif_path: str = 'planets_simulation.gif', gif_fps: int = 10, gif_start=0,
+             gif_length: int = 5, gif_zoom: float = 0.5):
+        """
+        Saves the viewed animation.
+        :param gif_path: path to saved file
+        :param gif_fps: frames per second
+        :param gif_start: where to start the saving (in seconds)
+        :param gif_length: how long the saved animation should be (in seconds)
+        :param gif_zoom:
+        :return:
+        """
+        self.animation.save_animation(gif_path=gif_path, gif_fps=gif_fps, gif_start=gif_start, gif_length=gif_length,
+                                      gif_zoom=gif_zoom)
