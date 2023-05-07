@@ -5,4 +5,4 @@ star_size = 1e10
 star_count = 500
 planet_scale = (4e9, 8e9)
 stay_in_system_force = 3e22
-edges = 1e12
+edges = 5e11

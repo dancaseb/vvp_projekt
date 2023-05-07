@@ -83,8 +83,7 @@ class Simulation:
     Load the planets and add them to the solar system
     """
 
-    def __init__(self, dt: int = 60 * 60 * 24, gif_path: str = 'planets_simulation.gif', background_on: bool = True,
-                 gif_fps: int = 10, gif_length: int = 30, gif_zoom: float = 1, **kwargs):
+    def __init__(self, dt: int = 60 * 60 * 24, background_on: bool = True, **kwargs):
         self.dt = dt
         if self.dt is None:
             raise ValueError('You must provide dt (time step) parameter.')
