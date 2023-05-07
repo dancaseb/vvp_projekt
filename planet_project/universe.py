@@ -137,7 +137,6 @@ class Planet:
         Update the plotting objects attributes.
         :return:
         """
-        self.planet_plot.position = self.position
         self.planet_plot.positions = self.positions
 
     class PlanetPlot:
@@ -149,7 +148,6 @@ class Planet:
             self.name = planet.name
             self.color = planet.color
             self.mass = planet.mass
-            self.position = planet.position
             self.positions = planet.positions
 
 

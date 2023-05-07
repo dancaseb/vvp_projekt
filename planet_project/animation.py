@@ -147,9 +147,10 @@ class Animation:
         self.paused = not self.paused
 
     def _find_limits(self):
-        # find lim_max and lim_min for given axis (0 is axis x and 1 is axis y)
-        x_positions = [planet.position[0] for planet in self.system.planets]
-        y_positions = [planet.position[1] for planet in self.system.planets]
+        # find lim_max and lim_min for given axis (0 is axis x and 1 is axis y). Minus first element in positions is the
+        # last known position of a planet.
+        x_positions = [planet.positions[-1][0] for planet in self.system.planets]
+        y_positions = [planet.positions[-1][1] for planet in self.system.planets]
         return min(x_positions) - edges, max(x_positions) + edges, min(y_positions) - edges, max(y_positions) + edges
 
     def _delete_planet_circles(self):
