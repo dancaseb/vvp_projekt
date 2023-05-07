@@ -32,8 +32,7 @@ class Animation:
         self.background = []
         # Create the figure object and axes
         self.fig, self.ax = plt.subplots(figsize=(8, 6))
-        self.xlim_min, self.xlim_max = self._find_limits(0)
-        self.ylim_min, self.ylim_max = self._find_limits(1)
+        self.xlim_min, self.xlim_max, self.ylim_min, self.ylim_max = self._find_limits()
         if self.background_on:
             self.stars_x = np.random.uniform(low=self.xlim_min, high=self.xlim_max, size=500)
             self.stars_y = np.random.uniform(low=self.ylim_min, high=self.ylim_max, size=500)
@@ -147,12 +146,11 @@ class Animation:
             self.planets_animation.pause()
         self.paused = not self.paused
 
-    def _find_limits(self, axis: int):
+    def _find_limits(self):
         # find lim_max and lim_min for given axis (0 is axis x and 1 is axis y)
-        if axis != 0 and axis != 1:
-            raise ValueError('axis must be set to zero or one in _find_limits function.')
-        positions = [planet.position[axis] for planet in self.system.planets]
-        return min(positions) - edges, max(positions) + edges
+        x_positions = [planet.position[0] for planet in self.system.planets]
+        y_positions = [planet.position[1] for planet in self.system.planets]
+        return min(x_positions) - edges, max(x_positions) + edges, min(y_positions) - edges, max(y_positions) + edges
 
     def _delete_planet_circles(self):
         # delete all patches from self.ax. We only add circles (representing the planet plot) as patches
