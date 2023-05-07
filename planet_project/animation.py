@@ -126,9 +126,10 @@ class Animation:
         # self.planets_animation.save("planets_simulation.mp4", writer=writer)
 
     def save_animation(self, gif_path: str = 'planets_simulation.gif', gif_fps: int = 10, gif_start=0,
-                       gif_length: int = 30, gif_zoom: float = 0.5):
+                       gif_length: int = 30, gif_zoom: float = 1, gif_center: tuple = None):
         """
         Save the animation. Works with data calculated from the simulation run by start_animation function.
+        :param gif_center:
         :param gif_path:
         :param gif_fps:
         :param gif_start:
@@ -136,12 +137,18 @@ class Animation:
         :param gif_zoom:
         :return:
         """
-        # plt.xlim(self.xlim_min * self.gif_zoom, self.xlim_max * self.gif_zoom)
-        # plt.ylim(self.ylim_min * self.gif_zoom, self.ylim_max * self.gif_zoom)
+
         start_frame = gif_start * gif_fps
         total_frames = gif_length * gif_fps
         # reset the fig to default settings
         self._reset_fig()
+
+        if gif_center is not None:
+            self._zoom_and_center(gif_zoom, gif_center)
+        elif gif_zoom is not None:
+            self._zoom_and_center(gif_zoom, self._get_fig_center())
+
+        # retrieve tha planet plots and past planet trajectories
         planet_plots = self.system.get_planet_plots()
         xlist = np.array([[position[0] for position in planet_plot.positions] for planet_plot in planet_plots])
         ylist = np.array([[position[1] for position in planet_plot.positions] for planet_plot in planet_plots])
@@ -224,3 +231,16 @@ class Animation:
         self.ax.set_ylim(ylim_min, ylim_max)
         self.ax.set_facecolor('black')
         self.paused = False
+
+    def _zoom_and_center(self, gif_zoom, gif_center):
+        # center and zoom in the ax limits for the saved animation
+        xlim_old, ylim_old = self.ax.get_xlim(), self.ax.get_ylim()
+        center_x, center_y = self._get_fig_center()
+        self.ax.set_xlim(((xlim_old[0] - (center_x - gif_center[0])) * gif_zoom),
+                         (xlim_old[1] - (center_x - gif_center[0])) * gif_zoom)
+        self.ax.set_ylim((ylim_old[0] - (center_y - gif_center[1])) * gif_zoom,
+                         (ylim_old[1] - (center_y - gif_center[1])) * gif_zoom)
+
+    def _get_fig_center(self):
+        xlim, ylim = self.ax.get_xlim(), self.ax.get_ylim()
+        return (xlim[0] + xlim[1]) / 2.0, (ylim[0] + ylim[1]) / 2.0
