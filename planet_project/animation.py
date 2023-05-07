@@ -167,10 +167,11 @@ class Animation:
         :param planet_plots:
         :return:
         """
-        # x,y coordinates for the planets actual position.
+        # x,y coordinates represent the planets last position.
         # At this position a circle representing the planet will be plotted
-        x = np.array([planet.position[0] for planet in planet_plots])
-        y = np.array([planet.position[1] for planet in planet_plots])
+        x = np.array([planet_x_positions[-1] for planet_x_positions in xlist])
+        y = np.array([planet_y_positions[-1] for planet_y_positions in ylist])
+
         colors = [planet.color for planet in planet_plots]
         masses = np.array([planet.mass for planet in planet_plots])
         mass_mask = masses <= star_mass
