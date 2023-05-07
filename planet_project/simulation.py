@@ -102,7 +102,7 @@ class Simulation:
         self.animation.start_animation()
 
     def save(self, gif_path: str = 'planets_simulation.gif', gif_fps: int = 10, gif_start=0,
-             gif_length: int = 5, gif_zoom: float = 0.5, gif_center: tuple = None):
+             gif_length: int = 5, gif_zoom: float = 1, gif_center: tuple = None):
         """
         Saves the viewed animation.
         :param gif_center: center of the zoomed gif. If not provided, the previous figure center remains
@@ -110,7 +110,8 @@ class Simulation:
         :param gif_fps: frames per second
         :param gif_start: where to start the saving (in seconds)
         :param gif_length: how long the saved animation should be (in seconds)
-        :param gif_zoom:
+        :param gif_zoom: zoom in or out. gif_zoom = 1 means no zoom. gif_zoom = 2 zooms out by making the axes twice as
+               long, gif_zoom = 0.1 zooms in and the axes are one tenth of the previous.
         :return:
         """
         self.animation.save_animation(gif_path=gif_path, gif_fps=gif_fps, gif_start=gif_start, gif_length=gif_length,

@@ -145,7 +145,7 @@ class Animation:
 
         if gif_center is not None:
             self._zoom_and_center(gif_zoom, gif_center)
-        elif gif_zoom is not None:
+        elif gif_zoom != 1:  # user wants to zoom in and keep the center
             self._zoom_and_center(gif_zoom, self._get_fig_center())
 
         # retrieve tha planet plots and past planet trajectories
